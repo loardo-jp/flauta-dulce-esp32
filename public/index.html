@@ -3,260 +3,527 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Flauta Dulce</title>
+<title>Flauta Dulce - Dispositivo Educativo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
 <style>
 /* ── Reset & Base ── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { font-size: 16px; }
+
+:root {
+  --wood-darkest: #130b07;
+  --wood-dark: #22140d;
+  --wood-medium: #3b2315;
+  --wood-warm: #5c3620;
+  --wood-light: #875231;
+  --amber-gold: #f59e0b;
+  --amber-glow: rgba(245, 158, 11, 0.35);
+  --green-glow: #10b981;
+  --red-glow: #ef4444;
+  --text-cream: #fef3c7;
+  --text-muted: #d4b896;
+}
+
 body {
-  font-family: 'Inter', sans-serif;
-  background: #0a0a0f;
-  color: #e0e0e8;
+  font-family: 'Outfit', sans-serif;
+  background-color: var(--wood-darkest);
+  color: var(--text-cream);
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
+  /* Fondo estilo madera noble con gradiente cálido ambiental */
   background-image:
-    radial-gradient(ellipse at 20% 0%, rgba(88,40,180,.25) 0%, transparent 60%),
-    radial-gradient(ellipse at 80% 100%, rgba(30,120,200,.15) 0%, transparent 60%);
+    radial-gradient(circle at 50% 0%, rgba(180, 100, 40, 0.18) 0%, transparent 65%),
+    radial-gradient(circle at 10% 90%, rgba(130, 70, 30, 0.15) 0%, transparent 50%),
+    repeating-linear-gradient(
+      92deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 2px,
+      transparent 2px,
+      transparent 8px
+    );
 }
 
-/* ── Glass card ── */
+/* ── Contenedor principal ── */
+.app-container {
+  width: 100%;
+  max-width: 520px;
+  padding: 16px 16px 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Tarjetas con estética madera noble & cristal cálido ── */
 .card {
-  background: rgba(255,255,255,.04);
-  border: 1px solid rgba(255,255,255,.08);
-  border-radius: 20px;
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: linear-gradient(145deg, rgba(59, 35, 21, 0.75), rgba(34, 20, 13, 0.85));
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 22px;
+  box-shadow:
+    0 12px 32px rgba(10, 5, 2, 0.65),
+    inset 0 1px 1px rgba(254, 243, 199, 0.15);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   padding: 24px;
   width: 100%;
-  max-width: 400px;
+  margin-bottom: 18px;
 }
 
-/* ── Header ── */
+/* ── Cabecera ── */
 header {
   text-align: center;
-  padding: 32px 16px 8px;
+  padding: 16px 8px 6px;
 }
 header h1 {
-  font-size: 2rem;
-  font-weight: 900;
-  background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fcd34d 55%, #d97706 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  text-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
+}
+header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 
-/* ── Status ── */
+/* ── Estado del WebSocket ── */
 .status-row {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin: 12px 0 20px;
-  font-size: .85rem;
-  color: #888;
+  margin: 10px 0 18px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  background: rgba(19, 11, 7, 0.6);
+  padding: 6px 14px;
+  border-radius: 99px;
+  border: 1px solid rgba(245, 158, 11, 0.18);
 }
 .status-dot {
-  width: 10px; height: 10px;
+  width: 9px; height: 9px;
   border-radius: 50%;
   background: #ef4444;
-  transition: background .3s;
+  transition: all 0.3s ease;
   box-shadow: 0 0 6px #ef4444;
 }
 .status-dot.on {
-  background: #22c55e;
-  box-shadow: 0 0 8px #22c55e;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
 }
 
-/* ── Start button ── */
+/* ── Botón Iniciar ── */
 .btn-start {
   display: block;
-  margin: 0 auto 24px;
-  padding: 14px 48px;
-  font-family: inherit;
-  font-size: 1.1rem;
+  margin: 0 auto 20px;
+  padding: 15px 44px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 1.05rem;
   font-weight: 700;
-  border: none;
-  border-radius: 14px;
+  letter-spacing: 1.5px;
+  border: 1px solid rgba(254, 243, 199, 0.3);
+  border-radius: 16px;
   cursor: pointer;
-  color: #fff;
-  background: linear-gradient(135deg, #7c3aed, #3b82f6);
-  box-shadow: 0 4px 24px rgba(99,60,220,.35);
-  transition: transform .15s, box-shadow .15s;
-  position: relative;
-  overflow: hidden;
+  color: #fffbeb;
+  background: linear-gradient(135deg, #b45309 0%, #78350f 50%, #451a03 100%);
+  box-shadow:
+    0 8px 24px rgba(180, 83, 9, 0.4),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
 }
-.btn-start:active { transform: scale(.96); }
+.btn-start:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(217, 119, 6, 0.5);
+}
+.btn-start:active { transform: scale(0.97); }
 .btn-start.active {
-  background: linear-gradient(135deg, #ef4444, #f97316);
-  box-shadow: 0 4px 24px rgba(239,68,68,.35);
+  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+  border-color: rgba(248, 113, 113, 0.4);
+  box-shadow: 0 8px 26px rgba(239, 68, 68, 0.45);
   animation: pulse-btn 1.8s ease-in-out infinite;
 }
 @keyframes pulse-btn {
-  0%,100% { box-shadow: 0 4px 24px rgba(239,68,68,.30); }
-  50%     { box-shadow: 0 4px 36px rgba(239,68,68,.55); }
+  0%,100% { box-shadow: 0 6px 20px rgba(239,68,68,0.35); }
+  50%     { box-shadow: 0 8px 32px rgba(239,68,68,0.65); }
 }
 
-/* ── Note display ── */
-.note-section { text-align: center; margin-bottom: 24px; }
+/* ── Tarjeta Nota & Frecuencia ── */
+.note-section {
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.note-section::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(245,158,11,0.18) 0%, transparent 70%);
+  pointer-events: none;
+}
 .note-name {
-  font-size: 4rem;
-  font-weight: 900;
-  min-height: 5rem;
+  font-family: 'Playfair Display', serif;
+  font-size: 4.5rem;
+  font-weight: 700;
+  min-height: 5.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform .15s, opacity .15s;
-  text-shadow: 0 0 30px rgba(167,139,250,.5);
+  color: #fef3c7;
+  text-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
+  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .note-name.pop {
-  animation: pop .25s ease;
+  animation: pop 0.28s ease;
 }
 @keyframes pop {
-  0%   { transform: scale(.85); opacity:.5; }
+  0%   { transform: scale(0.82); opacity: 0.6; }
   60%  { transform: scale(1.08); }
-  100% { transform: scale(1); opacity:1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 .freq-display {
-  font-size: .95rem;
-  color: #777;
-  margin-top: 2px;
+  font-size: 0.95rem;
+  color: #fcd34d;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
-/* ── Tuning bar ── */
-.tuning-section { margin-bottom: 24px; }
+/* ── Afinación ── */
 .tuning-label {
   text-align: center;
-  font-size: .8rem;
-  color: #666;
-  margin-bottom: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
 }
 .tuning-bar-wrap {
   position: relative;
-  height: 8px;
-  background: rgba(255,255,255,.08);
-  border-radius: 4px;
+  height: 10px;
+  background: rgba(19, 11, 7, 0.7);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 99px;
   overflow: hidden;
 }
 .tuning-center {
   position: absolute;
   left: 50%; top: 0;
   width: 2px; height: 100%;
-  background: rgba(255,255,255,.25);
+  background: rgba(254, 243, 199, 0.45);
   transform: translateX(-1px);
 }
 .tuning-indicator {
   position: absolute;
-  top: 0;
-  width: 12px; height: 100%;
-  background: #a78bfa;
-  border-radius: 4px;
+  top: 1px;
+  width: 14px; height: 8px;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 99px;
   left: 50%;
-  transform: translateX(-6px);
-  transition: left .12s ease;
-  box-shadow: 0 0 8px rgba(167,139,250,.6);
+  transform: translateX(-7px);
+  transition: left 0.12s ease;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
 }
 .tuning-cents {
   text-align: center;
-  font-size: .75rem;
-  color: #666;
-  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 7px;
 }
 
-/* ── Fingering diagram ── */
-.fingering-section {
+/* ── Flauta Realista Sección ── */
+.flute-card-header {
+  text-align: center;
+  margin-bottom: 14px;
+}
+.flute-card-header h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.35rem;
+  color: #fffbeb;
+}
+.flute-card-header p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* Leyenda de colores */
+.legend-row {
   display: flex;
-  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
   align-items: center;
   gap: 6px;
-  padding: 20px 0 8px;
+  font-size: 0.76rem;
+  color: var(--text-cream);
 }
-.hole-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.hole-label {
-  font-size: .7rem;
-  color: #555;
-  width: 60px;
-  text-align: right;
-}
-.hole {
-  width: 36px; height: 36px;
+.legend-dot {
+  width: 12px; height: 12px;
   border-radius: 50%;
-  border: 2px solid rgba(255,255,255,.15);
-  background: rgba(255,255,255,.04);
-  transition: background .25s, border-color .25s, box-shadow .25s;
+  border: 1px solid rgba(255,255,255,0.3);
 }
-.hole.closed {
-  background: #22c55e;
-  border-color: #22c55e;
-  box-shadow: 0 0 10px rgba(34,197,94,.45);
-}
-.hole.half {
-  background: radial-gradient(circle at 50% 50%, #ef4444 40%, rgba(255,255,255,.04) 41%);
+.legend-dot.green { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.6); }
+.legend-dot.red {
+  background: linear-gradient(90deg, #ef4444 50%, #29150d 50%);
   border-color: #ef4444;
-  box-shadow: 0 0 10px rgba(239,68,68,.40);
 }
-.separator {
-  width: 40px;
-  height: 1px;
-  background: rgba(255,255,255,.1);
-  margin: 4px 0;
-  margin-left: 72px;
+.legend-dot.open { background: #150a06; border-color: #875231; }
+
+/* Contenedor del SVG realista */
+.flute-stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 10px 0;
 }
 
-/* ── Utility ── */
-.gap { height: 16px; }
+/* Estilos para los orificios dentro del SVG */
+.hole-glow {
+  transition: fill 0.25s ease, filter 0.25s ease, stroke 0.25s ease;
+}
+.hole-core {
+  transition: fill 0.25s ease;
+}
 </style>
 </head>
 <body>
 
-<!-- Header -->
-<header>
-  <h1>🎵 Flauta Dulce</h1>
-</header>
+<div class="app-container">
+  <!-- Cabecera -->
+  <header>
+    <h1>Flauta Dulce</h1>
+    <p>Educador Interactivo ESP32</p>
+  </header>
 
-<!-- Status -->
-<div class="status-row">
-  <div class="status-dot" id="statusDot"></div>
-  <span id="statusText">Desconectado</span>
-</div>
-
-<!-- Start / Stop -->
-<button class="btn-start" id="btnStart">INICIAR</button>
-
-<!-- Note & frequency -->
-<div class="card note-section">
-  <div class="note-name" id="noteName">—</div>
-  <div class="freq-display" id="freqDisplay">— Hz</div>
-</div>
-
-<div class="gap"></div>
-
-<!-- Tuning -->
-<div class="card tuning-section">
-  <div class="tuning-label">Afinación</div>
-  <div class="tuning-bar-wrap">
-    <div class="tuning-center"></div>
-    <div class="tuning-indicator" id="tuningInd"></div>
+  <!-- Estado -->
+  <div class="status-row">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Desconectado del servidor</span>
   </div>
-  <div class="tuning-cents" id="tuningCents">0 cents</div>
+
+  <!-- Botón Iniciar -->
+  <button class="btn-start" id="btnStart">INICIAR ESCUCHA</button>
+
+  <!-- Tarjeta de Nota y Frecuencia -->
+  <div class="card note-section">
+    <div class="note-name" id="noteName">—</div>
+    <div class="freq-display" id="freqDisplay">— Hz</div>
+  </div>
+
+  <!-- Afinador -->
+  <div class="card">
+    <div class="tuning-label">Precisión de Afinación</div>
+    <div class="tuning-bar-wrap">
+      <div class="tuning-center"></div>
+      <div class="tuning-indicator" id="tuningInd"></div>
+    </div>
+    <div class="tuning-cents" id="tuningCents">0 cents</div>
+  </div>
+
+  <!-- Diagrama de Flauta Realista -->
+  <div class="card">
+    <div class="flute-card-header">
+      <h2>Digitación en la Flauta</h2>
+      <p>Posición real de los dedos para flauta soprano</p>
+    </div>
+
+    <!-- Leyenda -->
+    <div class="legend-row">
+      <div class="legend-item">
+        <span class="legend-dot green"></span> Tapado (Verde)
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot red"></span> Medio tapado (Rojo)
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot open"></span> Abierto
+      </div>
+    </div>
+
+    <!-- Flauta Dulce Realista en SVG -->
+    <div class="flute-stage">
+      <svg id="recorderSvg" viewBox="0 0 280 480" width="100%" style="max-width: 320px; height: auto;">
+        <defs>
+          <!-- Gradiente de madera noble para el cuerpo de la flauta -->
+          <linearGradient id="woodGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#2c160c" />
+            <stop offset="22%" stop-color="#6e3c23" />
+            <stop offset="48%" stop-color="#9e5c38" />
+            <stop offset="75%" stop-color="#59301a" />
+            <stop offset="100%" stop-color="#241108" />
+          </linearGradient>
+
+          <!-- Gradiente para juntas torneadas ornamentales (acabado marfil/madera oscura) -->
+          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#4a2613" />
+            <stop offset="45%" stop-color="#c8966e" />
+            <stop offset="100%" stop-color="#3b1d0e" />
+          </linearGradient>
+
+          <!-- Gradiente para el interior del bisel (ventana) -->
+          <linearGradient id="windowShadow" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#0f0703" />
+            <stop offset="100%" stop-color="#29150c" />
+          </linearGradient>
+
+          <!-- Brillo de LED verde -->
+          <filter id="glowGreen" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+
+          <!-- Brillo de LED rojo -->
+          <filter id="glowRed" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+        </defs>
+
+        <!-- ══════ COLUMNA IZQUIERDA: VISTA TRASERA (PORTAVOZ / THUMB HOLE) ══════ -->
+        <g id="thumbView" transform="translate(10, 50)">
+          <!-- Mini cuerpo trasero -->
+          <path d="M 30,0 C 45,0 48,15 48,30 L 44,110 L 16,110 L 12,30 C 12,15 15,0 30,0 Z" fill="url(#woodGradient)" stroke="#1a0b05" stroke-width="1.5" />
+          <!-- Anillo superior -->
+          <rect x="14" y="30" width="32" height="6" rx="2" fill="url(#ringGradient)" />
+          
+          <!-- Etiqueta Portavoz -->
+          <text x="30" y="-12" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="700">PORTAVOZ</text>
+          <text x="30" y="-1" text-anchor="middle" fill="#d4b896" font-size="9">(Atrás - 0)</text>
+
+          <!-- Orificio Portavoz (h8 en el firmware) -->
+          <circle id="hole_0_outer" cx="30" cy="65" r="11" fill="#150a06" stroke="#875231" stroke-width="2" />
+          <path id="hole_0_half" d="M 30,54 A 11,11 0 0 1 30,76 Z" fill="transparent" />
+          <circle id="hole_0_inner" cx="30" cy="65" r="6" fill="#0d0502" />
+        </g>
+
+        <!-- Línea conectora decorativa entre vista trasera y flauta frontal -->
+        <path d="M 68,115 C 85,115 95,115 108,115" stroke="rgba(245,158,11,0.35)" stroke-width="1" stroke-dasharray="3,3" />
+
+        <!-- ══════ COLUMNA CENTRO/DERECHA: CUERPO REALISTA DE LA FLAUTA (VISTA FRONTAL) ══════ -->
+        <g id="frontFlute">
+          <!-- CABEZA (Headjoint) -->
+          <!-- Boquilla superior curvada -->
+          <path d="M 125,12 C 133,10 147,10 155,12 L 162,55 L 118,55 Z" fill="url(#woodGradient)" stroke="#190c05" stroke-width="1.5" />
+          <path d="M 130,12 Q 140,16 150,12" stroke="rgba(255,255,255,0.25)" stroke-width="2" fill="none" />
+          
+          <!-- Ventana y Labio (Bisel) -->
+          <rect x="131" y="32" width="18" height="13" rx="2" fill="url(#windowShadow)" stroke="#522b16" stroke-width="1" />
+          <polygon points="131,45 149,45 140,36" fill="#8b4d2b" />
+
+          <!-- Anillo ornamental de unión cabeza-cuerpo -->
+          <rect x="116" y="55" width="48" height="10" rx="3" fill="url(#ringGradient)" stroke="#231006" stroke-width="1" />
+
+          <!-- CUERPO PRINCIPAL (Middle joint & Foot joint) -->
+          <path d="M 119,65 L 161,65 L 154,420 L 126,420 Z" fill="url(#woodGradient)" stroke="#190c05" stroke-width="1.5" />
+
+          <!-- Anillo inferior y Pabellón (Campana) -->
+          <rect x="123" y="418" width="34" height="8" rx="2" fill="url(#ringGradient)" stroke="#231006" stroke-width="1" />
+          <path d="M 124,426 C 117,445 113,458 113,466 L 167,466 C 167,458 163,445 156,426 Z" fill="url(#woodGradient)" stroke="#190c05" stroke-width="1.5" />
+          <!-- Apertura inferior de la campana -->
+          <ellipse cx="140" cy="466" rx="27" ry="5" fill="#130803" stroke="#482512" stroke-width="1.5" />
+
+          <!-- Brillo longitudinal en la madera -->
+          <path d="M 135,66 L 137,418" stroke="rgba(255,255,255,0.12)" stroke-width="3" />
+
+          <!-- ── ORIFICIOS FRONTALES (1 al 7) CON ETIQUETAS E INDICADORES ── -->
+          
+          <!-- Orificio 1 -->
+          <g transform="translate(140, 95)">
+            <circle id="hole_1_outer" r="10.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <path id="hole_1_half" d="M 0,-10.5 A 10.5,10.5 0 0 1 0,10.5 Z" fill="transparent" />
+            <circle id="hole_1_inner" r="5.5" fill="#0d0502" />
+            <line x1="16" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
+            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">1</text>
+            <text x="64" y="3" fill="#d4b896" font-size="10">Índice</text>
+          </g>
+
+          <!-- Orificio 2 -->
+          <g transform="translate(140, 140)">
+            <circle id="hole_2_outer" r="10.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <path id="hole_2_half" d="M 0,-10.5 A 10.5,10.5 0 0 1 0,10.5 Z" fill="transparent" />
+            <circle id="hole_2_inner" r="5.5" fill="#0d0502" />
+            <line x1="16" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
+            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">2</text>
+            <text x="64" y="3" fill="#d4b896" font-size="10">Medio</text>
+          </g>
+
+          <!-- Orificio 3 -->
+          <g transform="translate(140, 185)">
+            <circle id="hole_3_outer" r="10.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <path id="hole_3_half" d="M 0,-10.5 A 10.5,10.5 0 0 1 0,10.5 Z" fill="transparent" />
+            <circle id="hole_3_inner" r="5.5" fill="#0d0502" />
+            <line x1="16" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
+            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">3</text>
+            <text x="64" y="3" fill="#d4b896" font-size="10">Anular</text>
+          </g>
+
+          <!-- Orificio 4 -->
+          <g transform="translate(140, 230)">
+            <circle id="hole_4_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <path id="hole_4_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
+            <circle id="hole_4_inner" r="5" fill="#0d0502" />
+            <line x1="15" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
+            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">4</text>
+            <text x="64" y="3" fill="#d4b896" font-size="10">Índice der.</text>
+          </g>
+
+          <!-- Orificio 5 -->
+          <g transform="translate(140, 275)">
+            <circle id="hole_5_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <path id="hole_5_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
+            <circle id="hole_5_inner" r="5" fill="#0d0502" />
+            <line x1="15" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
+            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">5</text>
+            <text x="64" y="3" fill="#d4b896" font-size="10">Medio der.</text>
+          </g>
+
+          <!-- Orificio 6 (Doble en flautas barrocas) -->
+          <g transform="translate(140, 320)">
+            <circle id="hole_6_outer" r="9.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <path id="hole_6_half" d="M 0,-9.5 A 9.5,9.5 0 0 1 0,9.5 Z" fill="transparent" />
+            <circle id="hole_6_inner" r="4.5" fill="#0d0502" />
+            <line x1="14" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
+            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">6</text>
+            <text x="64" y="3" fill="#d4b896" font-size="10">Anular der.</text>
+          </g>
+
+          <!-- Orificio 7 (Doble / Pie en flautas barrocas, ligeramente inclinado) -->
+          <g transform="translate(143, 365)">
+            <circle id="hole_7_outer" r="9" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <path id="hole_7_half" d="M 0,-9 A 9,9 0 0 1 0,9 Z" fill="transparent" />
+            <circle id="hole_7_inner" r="4" fill="#0d0502" />
+            <line x1="14" y1="0" x2="39" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
+            <text x="45" y="4" fill="#fef3c7" font-size="12" font-weight="600">7</text>
+            <text x="61" y="3" fill="#d4b896" font-size="10">Meñique</text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
 </div>
-
-<div class="gap"></div>
-
-<!-- Fingering -->
-<div class="card">
-  <div class="fingering-section" id="fingerDiagram"></div>
-</div>
-
-<div class="gap"></div>
 
 <script>
 // ═══════════════════════════════════════════════════════
@@ -322,9 +589,7 @@ const FINGERINGS = {
   "Do'''":  [1,0,0,1,0,0,0,2]
 };
 
-// ═══════════════════════════════════════════════════════
-// Elementos del DOM
-// ═══════════════════════════════════════════════════════
+// Referencias DOM
 const statusDot   = document.getElementById('statusDot');
 const statusText  = document.getElementById('statusText');
 const btnStart    = document.getElementById('btnStart');
@@ -332,48 +597,50 @@ const noteNameEl  = document.getElementById('noteName');
 const freqDisplay = document.getElementById('freqDisplay');
 const tuningInd   = document.getElementById('tuningInd');
 const tuningCents = document.getElementById('tuningCents');
-const fingerDiag  = document.getElementById('fingerDiagram');
 
-// ═══════════════════════════════════════════════════════
-// Construir diagrama de digitación
-// Orden visual: portavoz (h8) arriba, luego h1..h7
-// ═══════════════════════════════════════════════════════
-const holeLabels = ['Portavoz','1','2','3','4','5','6','7'];
-// Mapeo: posición visual → índice en el array de digitación
-// Visual 0 = h8 (índice 7), Visual 1..7 = h1..h7 (índices 0..6)
-const holeElements = [];
-
-holeLabels.forEach((label, i) => {
-  if (i === 1) {
-    // Separador entre portavoz y los demás
-    const sep = document.createElement('div');
-    sep.className = 'separator';
-    fingerDiag.appendChild(sep);
-  }
-  const row = document.createElement('div');
-  row.className = 'hole-row';
-  const lbl = document.createElement('span');
-  lbl.className = 'hole-label';
-  lbl.textContent = label;
-  const circle = document.createElement('div');
-  circle.className = 'hole';
-  row.appendChild(lbl);
-  row.appendChild(circle);
-  fingerDiag.appendChild(row);
-  holeElements.push(circle);
-});
-
+// Mapeo de orificios del SVG [h0(portavoz), h1, h2, h3, h4, h5, h6, h7]
+// Nota: en FINGERINGS el orden es [h1, h2, h3, h4, h5, h6, h7, h8(portavoz)]
 function updateFingering(noteName) {
-  const fg = FINGERINGS[noteName];
-  holeElements.forEach((el, i) => {
-    // i=0 → portavoz (h8, index 7), i=1..7 → h1..h7 (index 0..6)
-    const idx = i === 0 ? 7 : i - 1;
-    const val = fg ? fg[idx] : -1;
-    el.classList.remove('closed','half');
-    if (val === 1) el.classList.add('closed');
-    else if (val === 2) el.classList.add('half');
-  });
+  const fg = noteName ? FINGERINGS[noteName] : null;
+
+  for (let holeIdx = 0; holeIdx <= 7; holeIdx++) {
+    const outerEl = document.getElementById(`hole_${holeIdx}_outer`);
+    const halfEl  = document.getElementById(`hole_${holeIdx}_half`);
+    const innerEl = document.getElementById(`hole_${holeIdx}_inner`);
+    if (!outerEl || !halfEl || !innerEl) continue;
+
+    // holeIdx 0 corresponde a h8 (portavoz, índice 7 en el array de digitación)
+    // holeIdx 1..7 corresponde a h1..h7 (índice holeIdx - 1)
+    const val = fg ? (holeIdx === 0 ? fg[7] : fg[holeIdx - 1]) : 0;
+
+    outerEl.removeAttribute('filter');
+
+    if (val === 1) {
+      // Tapado completo (Verde LED brillante)
+      outerEl.setAttribute('fill', '#10b981');
+      outerEl.setAttribute('stroke', '#059669');
+      outerEl.setAttribute('filter', 'url(#glowGreen)');
+      halfEl.setAttribute('fill', 'transparent');
+      innerEl.setAttribute('fill', '#d1fae5');
+    } else if (val === 2) {
+      // Medio tapado (Rojo LED brillante a mitad)
+      outerEl.setAttribute('fill', '#1e100a');
+      outerEl.setAttribute('stroke', '#ef4444');
+      outerEl.setAttribute('filter', 'url(#glowRed)');
+      halfEl.setAttribute('fill', '#ef4444');
+      innerEl.setAttribute('fill', '#fecaca');
+    } else {
+      // Abierto (Madera oscura)
+      outerEl.setAttribute('fill', '#150a06');
+      outerEl.setAttribute('stroke', '#875231');
+      halfEl.setAttribute('fill', 'transparent');
+      innerEl.setAttribute('fill', '#0d0502');
+    }
+  }
 }
+
+// Inicializar la flauta en estado abierto
+updateFingering(null);
 
 // ═══════════════════════════════════════════════════════
 // WebSocket
@@ -388,15 +655,14 @@ function connectWS() {
   ws.onopen = () => {
     wsConnected = true;
     statusDot.classList.add('on');
-    statusText.textContent = 'Conectado';
+    statusText.textContent = 'Conectado al servidor';
     ws.send(JSON.stringify({ type: 'register', device: 'browser' }));
   };
 
   ws.onclose = () => {
     wsConnected = false;
     statusDot.classList.remove('on');
-    statusText.textContent = 'Desconectado';
-    // Reintentar en 2 s
+    statusText.textContent = 'Desconectado - Reconectando...';
     setTimeout(connectWS, 2000);
   };
 
@@ -409,18 +675,16 @@ function sendNote(name) {
 }
 
 // ═══════════════════════════════════════════════════════
-// Audio & YIN pitch detection
+// Audio & Algoritmo YIN para detección de tono
 // ═══════════════════════════════════════════════════════
 let audioCtx, analyser, micStream, isListening = false;
 const BUFFER_SIZE = 2048;
 let dataBuffer = new Float32Array(BUFFER_SIZE);
 
-// YIN Algorithm
 function yin(buffer, sampleRate) {
   const halfLen = Math.floor(buffer.length / 2);
   const yinBuf = new Float32Array(halfLen);
 
-  // Paso 1 & 2: Diferencia cuadrática y normalización acumulativa
   yinBuf[0] = 1;
   let runningSum = 0;
   for (let tau = 1; tau < halfLen; tau++) {
@@ -434,7 +698,6 @@ function yin(buffer, sampleRate) {
     yinBuf[tau] *= tau / runningSum;
   }
 
-  // Paso 3: Umbral absoluto
   const threshold = 0.15;
   let tauEstimate = -1;
   for (let tau = 2; tau < halfLen; tau++) {
@@ -446,7 +709,6 @@ function yin(buffer, sampleRate) {
   }
   if (tauEstimate === -1) return -1;
 
-  // Paso 4: Interpolación parabólica
   const s0 = tauEstimate > 0 ? yinBuf[tauEstimate - 1] : yinBuf[tauEstimate];
   const s1 = yinBuf[tauEstimate];
   const s2 = tauEstimate + 1 < halfLen ? yinBuf[tauEstimate + 1] : yinBuf[tauEstimate];
@@ -457,12 +719,10 @@ function yin(buffer, sampleRate) {
   return sampleRate / betterTau;
 }
 
-// Conversión a cents
 function freqToCents(f, fRef) {
   return 1200 * Math.log2(f / fRef);
 }
 
-// Encontrar nota más cercana (±50 cents)
 function matchNote(freq) {
   let best = null, bestCents = Infinity;
   for (const n of NOTE_TABLE) {
@@ -475,18 +735,15 @@ function matchNote(freq) {
   return null;
 }
 
-// ── Estado de estabilización ──
 let stableCount = 0;
 let lastCandidate = '';
 let lastSentNote  = '';
 const STABLE_THRESHOLD = 3;
 
-// ── Bucle de detección ──
 function detect() {
   if (!isListening) return;
   analyser.getFloatTimeDomainData(dataBuffer);
 
-  // Verificar si hay señal significativa
   let rms = 0;
   for (let i = 0; i < BUFFER_SIZE; i++) rms += dataBuffer[i] * dataBuffer[i];
   rms = Math.sqrt(rms / BUFFER_SIZE);
@@ -498,7 +755,6 @@ function detect() {
       if (result) {
         const { note, cents } = result;
 
-        // Estabilización
         if (note.name === lastCandidate) {
           stableCount++;
         } else {
@@ -507,16 +763,14 @@ function detect() {
         }
 
         if (stableCount >= STABLE_THRESHOLD) {
-          // Actualizar UI
           if (noteNameEl.textContent !== note.name) {
             noteNameEl.textContent = note.name;
             noteNameEl.classList.remove('pop');
-            void noteNameEl.offsetWidth; // trigger reflow
+            void noteNameEl.offsetWidth;
             noteNameEl.classList.add('pop');
           }
           freqDisplay.textContent = freq.toFixed(1) + ' Hz';
 
-          // Tuning bar (mapeamos ±50 cents → 0%-100%)
           const pct = 50 + (cents / 50) * 50;
           tuningInd.style.left = Math.max(0, Math.min(100, pct)) + '%';
           const sign = cents >= 0 ? '+' : '';
@@ -524,7 +778,6 @@ function detect() {
 
           updateFingering(note.name);
 
-          // Enviar por WS solo si cambió
           if (note.name !== lastSentNote) {
             lastSentNote = note.name;
             sendNote(note.name);
@@ -537,9 +790,6 @@ function detect() {
   requestAnimationFrame(detect);
 }
 
-// ═══════════════════════════════════════════════════════
-// Botón iniciar / detener
-// ═══════════════════════════════════════════════════════
 btnStart.addEventListener('click', async () => {
   if (!isListening) {
     try {
@@ -552,7 +802,7 @@ btnStart.addEventListener('click', async () => {
       dataBuffer = new Float32Array(BUFFER_SIZE);
 
       isListening = true;
-      btnStart.textContent = 'DETENER';
+      btnStart.textContent = 'DETENER ESCUCHA';
       btnStart.classList.add('active');
       requestAnimationFrame(detect);
     } catch (e) {
@@ -562,7 +812,7 @@ btnStart.addEventListener('click', async () => {
     isListening = false;
     if (micStream) micStream.getTracks().forEach(t => t.stop());
     if (audioCtx) audioCtx.close();
-    btnStart.textContent = 'INICIAR';
+    btnStart.textContent = 'INICIAR ESCUCHA';
     btnStart.classList.remove('active');
     noteNameEl.textContent = '—';
     freqDisplay.textContent = '— Hz';
