@@ -7,19 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-/* ── Reset & Base ── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { font-size: 16px; }
 
 :root {
-  --bg-main: #0f172a;
-  --bg-card: #1e293b;
-  --border-card: #334155;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --accent-note: #38bdf8;
+  --bg-main: #f4ebd0;
+  --bg-card: #fffcf5;
+  --border-card: #d8c3a5;
+  --text-main: #3e2723;
+  --text-muted: #795548;
+  --primary: #6d4c41;
+  --primary-hover: #4e342e;
+  --accent-note: #a0522d;
   --green-led: #10b981;
   --red-led: #ef4444;
 }
@@ -44,7 +43,6 @@ body {
   align-items: center;
 }
 
-/* ── Cabecera Estándar ── */
 header {
   text-align: center;
   margin-bottom: 20px;
@@ -61,7 +59,6 @@ header p {
   margin-top: 4px;
 }
 
-/* ── Barra de controles superior ── */
 .top-controls {
   display: flex;
   flex-wrap: wrap;
@@ -75,12 +72,12 @@ header p {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(15, 23, 42, 0.7);
+  background: #eae0c8;
   border: 1px solid var(--border-card);
   padding: 8px 16px;
   border-radius: 999px;
   font-size: 0.85rem;
-  color: var(--text-muted);
+  color: var(--text-main);
 }
 .status-dot {
   width: 9px; height: 9px;
@@ -93,7 +90,6 @@ header p {
   box-shadow: 0 0 8px var(--green-led);
 }
 
-/* Botón principal estándar */
 .btn-start {
   padding: 10px 32px;
   font-family: inherit;
@@ -104,7 +100,7 @@ header p {
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 12px rgba(109, 76, 65, 0.25);
   transition: all 0.2s ease;
 }
 .btn-start:hover {
@@ -113,11 +109,10 @@ header p {
 }
 .btn-start:active { transform: scale(0.98); }
 .btn-start.active {
-  background: #dc2626;
-  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  background: #c62828;
+  box-shadow: 0 4px 12px rgba(198, 40, 40, 0.35);
 }
 
-/* ── Panel Principal Lado a Lado ── */
 .workshop-stage {
   width: 100%;
   display: grid;
@@ -132,20 +127,18 @@ header p {
   }
 }
 
-/* ── Tarjetas Estándar ── */
 .card-panel {
   background: var(--bg-card);
   border: 1px solid var(--border-card);
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(90, 70, 50, 0.12);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
-/* ── Tarjeta Izquierda: Nota Detectada ── */
 .note-panel {
   text-align: center;
   min-height: 360px;
@@ -159,10 +152,9 @@ header p {
   margin-bottom: 20px;
 }
 
-/* Contenedor interior nota */
 .note-box {
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: #fdfaf3;
+  border: 1px solid #d8c3a5;
   border-radius: 14px;
   width: 100%;
   max-width: 240px;
@@ -199,7 +191,6 @@ header p {
   font-weight: 500;
 }
 
-/* Leyenda inferior limpia */
 .legend-mini {
   display: flex;
   gap: 16px;
@@ -214,7 +205,6 @@ header p {
   margin-right: 6px;
 }
 
-/* ── Tarjeta Derecha: Flauta Realista ── */
 .flute-panel {
   padding: 20px 12px;
 }
@@ -229,13 +219,11 @@ header p {
 <body>
 
 <div class="app-container">
-  <!-- Cabecera Limpia -->
   <header>
     <h1>Flauta Dulce - ESP32</h1>
     <p>Asistente interactivo de digitación y tono en tiempo real</p>
   </header>
 
-  <!-- Controles y Estado -->
   <div class="top-controls">
     <div class="status-badge">
       <div class="status-dot" id="statusDot"></div>
@@ -244,9 +232,7 @@ header p {
     <button class="btn-start" id="btnStart">INICIAR</button>
   </div>
 
-  <!-- Escenario Principal Lado a Lado -->
   <div class="workshop-stage">
-    <!-- Panel Izquierdo: Nota detectada -->
     <div class="card-panel note-panel">
       <div class="note-panel-title">Nota Detectada</div>
       <div class="note-box">
@@ -254,32 +240,29 @@ header p {
         <div class="freq-display" id="freqDisplay">— Hz</div>
       </div>
 
-      <!-- Leyenda rápida -->
       <div class="legend-mini">
         <span><span class="dot-legend" style="background:#10b981;"></span>Tapado</span>
         <span><span class="dot-legend" style="background:#ef4444;"></span>Medio</span>
-        <span><span class="dot-legend" style="background:#1e293b; border:1px solid #64748b;"></span>Abierto</span>
+        <span><span class="dot-legend" style="background:#fffcf5; border:1px solid #795548;"></span>Abierto</span>
       </div>
     </div>
 
-    <!-- Panel Derecho: Flauta Realista al lado de la nota -->
     <div class="card-panel flute-panel">
       <div class="flute-svg-wrap">
         <svg id="recorderSvg" viewBox="0 0 250 440" width="100%" style="max-width: 270px; height: auto;">
           <defs>
-            <!-- Gradiente rústico de madera torneada -->
             <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#231107" />
-              <stop offset="25%" stop-color="#5a3118" />
-              <stop offset="50%" stop-color="#874e2b" />
-              <stop offset="78%" stop-color="#4d2712" />
-              <stop offset="100%" stop-color="#1d0d05" />
+              <stop offset="0%" stop-color="#3e2723" />
+              <stop offset="25%" stop-color="#6d4c41" />
+              <stop offset="50%" stop-color="#8d6e63" />
+              <stop offset="78%" stop-color="#5d4037" />
+              <stop offset="100%" stop-color="#3e2723" />
             </linearGradient>
 
             <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#3b1d0e" />
-              <stop offset="50%" stop-color="#ba8658" />
-              <stop offset="100%" stop-color="#2a1409" />
+              <stop offset="0%" stop-color="#4e342e" />
+              <stop offset="50%" stop-color="#d7ccc8" />
+              <stop offset="100%" stop-color="#3e2723" />
             </linearGradient>
 
             <filter id="glowG" x="-50%" y="-50%" width="200%" height="200%">
@@ -299,93 +282,77 @@ header p {
             </filter>
           </defs>
 
-          <!-- ── VISTA TRASERA (Portavoz - P) ── -->
           <g transform="translate(18, 55)">
-            <path d="M 24,0 C 36,0 38,12 38,24 L 35,95 L 13,95 L 10,24 C 10,12 12,0 24,0 Z" fill="url(#woodGrad)" stroke="#160803" stroke-width="1.5" />
+            <path d="M 24,0 C 36,0 38,12 38,24 L 35,95 L 13,95 L 10,24 C 10,12 12,0 24,0 Z" fill="url(#woodGrad)" stroke="#3e2723" stroke-width="1.5" />
             <rect x="11" y="24" width="26" height="5" rx="1.5" fill="url(#ringGrad)" />
-            
-            <text x="24" y="-8" text-anchor="middle" fill="#d8c29d" font-family="'Cinzel', serif" font-size="11" font-weight="700">P</text>
-
-            <circle id="hole_0_outer" cx="24" cy="56" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <text x="24" y="-8" text-anchor="middle" fill="#5d4037" font-weight="700" font-size="11">P</text>
+            <circle id="hole_0_outer" cx="24" cy="56" r="10" fill="#2d1e18" stroke="#8d6e63" stroke-width="2" />
             <path id="hole_0_half" d="M 24,46 A 10,10 0 0 1 24,66 Z" fill="transparent" />
-            <circle id="hole_0_inner" cx="24" cy="56" r="5" fill="#0d0502" />
+            <circle id="hole_0_inner" cx="24" cy="56" r="5" fill="#1b110e" />
           </g>
 
-          <!-- Línea divisoria sutil -->
-          <line x1="68" y1="30" x2="68" y2="410" stroke="rgba(135, 82, 49, 0.25)" stroke-width="1" stroke-dasharray="4,4" />
+          <line x1="68" y1="30" x2="68" y2="410" stroke="rgba(141, 110, 99, 0.3)" stroke-width="1" stroke-dasharray="4,4" />
 
-          <!-- ── VISTA FRONTAL CUERPO FLAUTA ── -->
           <g transform="translate(45, 0)">
-            <!-- Cabeza -->
-            <path d="M 98,10 C 105,8 116,8 123,10 L 129,48 L 92,48 Z" fill="url(#woodGrad)" stroke="#160803" stroke-width="1.5" />
-            <rect x="102" y="27" width="16" height="11" rx="2" fill="#120703" stroke="#4d2712" stroke-width="1" />
-            <polygon points="102,38 118,38 110,31" fill="#7d4526" />
-            <rect x="90" y="48" width="41" height="8" rx="2" fill="url(#ringGrad)" stroke="#160803" stroke-width="1" />
+            <path d="M 98,10 C 105,8 116,8 123,10 L 129,48 L 92,48 Z" fill="url(#woodGrad)" stroke="#3e2723" stroke-width="1.5" />
+            <rect x="102" y="27" width="16" height="11" rx="2" fill="#2d1e18" stroke="#5d4037" stroke-width="1" />
+            <polygon points="102,38 118,38 110,31" fill="#8d6e63" />
+            <rect x="90" y="48" width="41" height="8" rx="2" fill="url(#ringGrad)" stroke="#3e2723" stroke-width="1" />
 
-            <!-- Cuerpo y pie -->
-            <path d="M 93,56 L 128,56 L 122,382 L 99,382 Z" fill="url(#woodGrad)" stroke="#160803" stroke-width="1.5" />
-            <rect x="96" y="380" width="29" height="7" rx="2" fill="url(#ringGrad)" stroke="#160803" stroke-width="1" />
-            <path d="M 97,387 C 91,404 88,414 88,422 L 133,422 C 133,414 130,404 124,387 Z" fill="url(#woodGrad)" stroke="#160803" stroke-width="1.5" />
-            <ellipse cx="110.5" cy="422" rx="22.5" ry="4.5" fill="#130803" stroke="#482512" stroke-width="1.5" />
+            <path d="M 93,56 L 128,56 L 122,382 L 99,382 Z" fill="url(#woodGrad)" stroke="#3e2723" stroke-width="1.5" />
+            <rect x="96" y="380" width="29" height="7" rx="2" fill="url(#ringGrad)" stroke="#3e2723" stroke-width="1" />
+            <path d="M 97,387 C 91,404 88,414 88,422 L 133,422 C 133,414 130,404 124,387 Z" fill="url(#woodGrad)" stroke="#3e2723" stroke-width="1.5" />
+            <ellipse cx="110.5" cy="422" rx="22.5" ry="4.5" fill="#2d1e18" stroke="#5d4037" stroke-width="1.5" />
 
-            <!-- Brillo de veta -->
-            <path d="M 106,58 L 108,380" stroke="rgba(255,255,255,0.12)" stroke-width="2.5" />
+            <path d="M 106,58 L 108,380" stroke="rgba(255,255,255,0.18)" stroke-width="2.5" />
 
-            <!-- ORIFICIOS 1 AL 7 (SÓLO NÚMERO DE ORIFICIO) -->
-            <!-- Orificio 1 -->
             <g transform="translate(110.5, 84)">
-              <circle id="hole_1_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <circle id="hole_1_outer" r="10" fill="#2d1e18" stroke="#8d6e63" stroke-width="2" />
               <path id="hole_1_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
-              <circle id="hole_1_inner" r="5" fill="#0d0502" />
-              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">1</text>
+              <circle id="hole_1_inner" r="5" fill="#1b110e" />
+              <text x="22" y="4" fill="#5d4037" font-weight="700" font-size="13">1</text>
             </g>
 
-            <!-- Orificio 2 -->
             <g transform="translate(110.5, 126)">
-              <circle id="hole_2_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <circle id="hole_2_outer" r="10" fill="#2d1e18" stroke="#8d6e63" stroke-width="2" />
               <path id="hole_2_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
-              <circle id="hole_2_inner" r="5" fill="#0d0502" />
-              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">2</text>
+              <circle id="hole_2_inner" r="5" fill="#1b110e" />
+              <text x="22" y="4" fill="#5d4037" font-weight="700" font-size="13">2</text>
             </g>
 
-            <!-- Orificio 3 -->
             <g transform="translate(110.5, 168)">
-              <circle id="hole_3_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <circle id="hole_3_outer" r="10" fill="#2d1e18" stroke="#8d6e63" stroke-width="2" />
               <path id="hole_3_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
-              <circle id="hole_3_inner" r="5" fill="#0d0502" />
-              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">3</text>
+              <circle id="hole_3_inner" r="5" fill="#1b110e" />
+              <text x="22" y="4" fill="#5d4037" font-weight="700" font-size="13">3</text>
             </g>
 
-            <!-- Orificio 4 -->
             <g transform="translate(110.5, 210)">
-              <circle id="hole_4_outer" r="9.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <circle id="hole_4_outer" r="9.5" fill="#2d1e18" stroke="#8d6e63" stroke-width="2" />
               <path id="hole_4_half" d="M 0,-9.5 A 9.5,9.5 0 0 1 0,9.5 Z" fill="transparent" />
-              <circle id="hole_4_inner" r="4.5" fill="#0d0502" />
-              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">4</text>
+              <circle id="hole_4_inner" r="4.5" fill="#1b110e" />
+              <text x="22" y="4" fill="#5d4037" font-weight="700" font-size="13">4</text>
             </g>
 
-            <!-- Orificio 5 -->
             <g transform="translate(110.5, 252)">
-              <circle id="hole_5_outer" r="9.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <circle id="hole_5_outer" r="9.5" fill="#2d1e18" stroke="#8d6e63" stroke-width="2" />
               <path id="hole_5_half" d="M 0,-9.5 A 9.5,9.5 0 0 1 0,9.5 Z" fill="transparent" />
-              <circle id="hole_5_inner" r="4.5" fill="#0d0502" />
-              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">5</text>
+              <circle id="hole_5_inner" r="4.5" fill="#1b110e" />
+              <text x="22" y="4" fill="#5d4037" font-weight="700" font-size="13">5</text>
             </g>
 
-            <!-- Orificio 6 -->
             <g transform="translate(110.5, 294)">
-              <circle id="hole_6_outer" r="9" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <circle id="hole_6_outer" r="9" fill="#2d1e18" stroke="#8d6e63" stroke-width="2" />
               <path id="hole_6_half" d="M 0,-9 A 9,9 0 0 1 0,9 Z" fill="transparent" />
-              <circle id="hole_6_inner" r="4" fill="#0d0502" />
-              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">6</text>
+              <circle id="hole_6_inner" r="4" fill="#1b110e" />
+              <text x="22" y="4" fill="#5d4037" font-weight="700" font-size="13">6</text>
             </g>
 
-            <!-- Orificio 7 -->
             <g transform="translate(113, 336)">
-              <circle id="hole_7_outer" r="8.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <circle id="hole_7_outer" r="8.5" fill="#2d1e18" stroke="#8d6e63" stroke-width="2" />
               <path id="hole_7_half" d="M 0,-8.5 A 8.5,8.5 0 0 1 0,8.5 Z" fill="transparent" />
-              <circle id="hole_7_inner" r="3.8" fill="#0d0502" />
-              <text x="20" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">7</text>
+              <circle id="hole_7_inner" r="3.8" fill="#1b110e" />
+              <text x="20" y="4" fill="#5d4037" font-weight="700" font-size="13">7</text>
             </g>
           </g>
         </svg>
@@ -395,9 +362,6 @@ header p {
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-// Tabla de notas y frecuencias (flauta soprano, octavas 5-6-7)
-// ═══════════════════════════════════════════════════════
 const NOTE_TABLE = [
   { name: "Do",    freq: 523.25  },
   { name: "Do#",   freq: 554.37  },
@@ -426,10 +390,6 @@ const NOTE_TABLE = [
   { name: "Do'''", freq: 2093.00 }
 ];
 
-// ═══════════════════════════════════════════════════════
-// Tabla de digitación [h1,h2,h3,h4,h5,h6,h7,h8(portavoz)]
-// Coincidente con digitación barroca exacta (0=abierto, 1=cerrado, 2=medio)
-// ═══════════════════════════════════════════════════════
 const FINGERINGS = {
   "Do":     [1,1,1,1,1,1,1,1],
   "Do#":    [1,1,1,1,1,1,2,1],
@@ -484,23 +444,22 @@ function updateFingering(noteName) {
       halfEl.setAttribute('fill', 'transparent');
       innerEl.setAttribute('fill', '#d1fae5');
     } else if (val === 2) {
-      outerEl.setAttribute('fill', '#1e100a');
+      outerEl.setAttribute('fill', '#3e2723');
       outerEl.setAttribute('stroke', '#ef4444');
       outerEl.setAttribute('filter', 'url(#glowR)');
       halfEl.setAttribute('fill', '#ef4444');
       innerEl.setAttribute('fill', '#fecaca');
     } else {
-      outerEl.setAttribute('fill', '#150a06');
-      outerEl.setAttribute('stroke', '#875231');
+      outerEl.setAttribute('fill', '#2d1e18');
+      outerEl.setAttribute('stroke', '#8d6e63');
       halfEl.setAttribute('fill', 'transparent');
-      innerEl.setAttribute('fill', '#0d0502');
+      innerEl.setAttribute('fill', '#1b110e');
     }
   }
 }
 
 updateFingering(null);
 
-// WebSocket
 let ws = null;
 let wsConnected = false;
 
@@ -530,21 +489,15 @@ function sendNote(name) {
   if (ws && wsConnected) ws.send(name);
 }
 
-// ═══════════════════════════════════════════════════════
-// Audio & Detección de Tono Simple (Autocorrelación Básica)
-// ═══════════════════════════════════════════════════════
 let audioCtx, analyser, micStream, isListening = false;
 const BUFFER_SIZE = 2048;
 let dataBuffer = new Float32Array(BUFFER_SIZE);
 
-// Función sencilla para encontrar la frecuencia del sonido por Autocorrelación
 function detectarTonoSimple(buffer, sampleRate) {
-  // 1. Ignorar si hay silencio o ruido muy bajo
   let rms = 0;
   for (let i = 0; i < buffer.length; i++) rms += buffer[i] * buffer[i];
   if (Math.sqrt(rms / buffer.length) < 0.012) return -1;
 
-  // 2. Buscar el período de repetición fundamental (flauta soprano: ~450 Hz a ~2150 Hz)
   const minPeriod = Math.floor(sampleRate / 2200);
   const maxPeriod = Math.floor(sampleRate / 450);
 
@@ -562,11 +515,9 @@ function detectarTonoSimple(buffer, sampleRate) {
     }
   }
 
-  // Si hay suficiente correlación, devolver la frecuencia encontrada
   return bestPeriod > 0 ? sampleRate / bestPeriod : -1;
 }
 
-// Buscar cuál es la nota musical más cercana en nuestra tabla
 function matchNote(freq) {
   let best = null, bestDiff = Infinity;
   for (const n of NOTE_TABLE) {
@@ -576,7 +527,6 @@ function matchNote(freq) {
       best = n;
     }
   }
-  // Tolerancia del 4% en frecuencia respecto a la nota teórica
   if (best && bestDiff < best.freq * 0.04) return { note: best };
   return null;
 }
@@ -602,7 +552,6 @@ function detect() {
         lastCandidate = note.name;
       }
 
-      // Estabilizar tras 2 lecturas consecutivas para evitar parpadeos
       if (stableCount >= 2) {
         if (noteNameEl.textContent !== note.name) {
           noteNameEl.textContent = note.name;
