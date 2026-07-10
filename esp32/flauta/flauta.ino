@@ -13,7 +13,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <WiFi.h>
-#include <WebSocketsClient.h>
+#include <WebSocketsClient_Generic.h>
 
 // =============================================================
 // ⚙️  CONFIGURACIÓN DEL USUARIO - ¡MODIFICA ESTOS VALORES!
@@ -21,8 +21,8 @@
 
 // --- Credenciales WiFi ---
 // Cambia estos valores por el nombre y contraseña de tu red WiFi
-const char* wifi_ssid     = "TU_RED_WIFI";
-const char* wifi_password = "TU_CONTRASEÑA";
+const char* wifi_ssid     = "consultorio";
+const char* wifi_password = "Consultorio2024";
 
 // --- Servidor WebSocket (Railway) ---
 // Cambia estos valores por la URL de tu servidor en Railway
