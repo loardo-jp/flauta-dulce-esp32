@@ -424,10 +424,37 @@ void setup() {
 
   // --- Conectar a WiFi ---
   mostrarTextoOLED("Conectando WiFi...", wifi_ssid);
+
+  // Limpiar estado WiFi anterior
+  WiFi.disconnect(true);
+  delay(1000);
+  WiFi.mode(WIFI_STA);
+  delay(100);
+
+  // Escanear redes disponibles para diagnóstico
+  Serial.println("Escaneando redes WiFi...");
+  int numRedes = WiFi.scanNetworks();
+  Serial.print("Redes encontradas: ");
+  Serial.println(numRedes);
+  bool redEncontrada = false;
+  for (int i = 0; i < numRedes; i++) {
+    Serial.print("  - ");
+    Serial.print(WiFi.SSID(i));
+    Serial.print(" (");
+    Serial.print(WiFi.RSSI(i));
+    Serial.println(" dBm)");
+    if (WiFi.SSID(i) == String(wifi_ssid)) redEncontrada = true;
+  }
+  if (redEncontrada) {
+    Serial.println(">>> Red encontrada! Conectando...");
+  } else {
+    Serial.println(">>> ADVERTENCIA: Red NO visible. Verifica el hotspot.");
+    mostrarTextoOLED("Red no visible", "Revisa hotspot");
+    delay(3000);
+  }
+
   Serial.print("Conectando a WiFi: ");
   Serial.println(wifi_ssid);
-
-  WiFi.mode(WIFI_STA);
   WiFi.begin(wifi_ssid, wifi_password);
 
   // Esperar conexión WiFi con indicador visual
@@ -443,9 +470,13 @@ void setup() {
       mostrarTextoOLED("Conectando WiFi...", msg.c_str());
     }
 
-    // Si lleva más de 30 segundos, reiniciar ESP32
-    if (intentos > 60) {
-      Serial.println("\nError: No se pudo conectar al WiFi. Reiniciando...");
+    // Si lleva más de 40 segundos, mostrar estado y reiniciar
+    if (intentos > 80) {
+      Serial.println();
+      Serial.print("Estado WiFi (codigo): ");
+      Serial.println(WiFi.status());
+      Serial.println("Codigos: 1=SinRed 3=OK 4=Fallo 6=Desconectado");
+      Serial.println("No se pudo conectar. Reiniciando...");
       mostrarTextoOLED("Error WiFi", "Reiniciando...");
       delay(2000);
       ESP.restart();
