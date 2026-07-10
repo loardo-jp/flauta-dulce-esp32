@@ -26,7 +26,7 @@ const char* wifi_password = "TU_CONTRASEÑA";
 
 // --- Servidor WebSocket (Railway) ---
 // Cambia estos valores por la URL de tu servidor en Railway
-const char* ws_host = "tu-app.railway.app";
+const char* ws_host = "flauta-dulce-esp32-production.up.railway.app";
 const int   ws_port = 443;
 const char* ws_path = "/ws";
 
