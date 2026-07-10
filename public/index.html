@@ -565,105 +565,93 @@ function sendNote(name) {
   if (ws && wsConnected) ws.send(name);
 }
 
-// Audio & YIN
+// ═══════════════════════════════════════════════════════
+// Audio & Detección de Tono Simple (Autocorrelación Básica)
+// ═══════════════════════════════════════════════════════
 let audioCtx, analyser, micStream, isListening = false;
 const BUFFER_SIZE = 2048;
 let dataBuffer = new Float32Array(BUFFER_SIZE);
 
-function yin(buffer, sampleRate) {
-  const halfLen = Math.floor(buffer.length / 2);
-  const yinBuf = new Float32Array(halfLen);
+// Función sencilla para encontrar la frecuencia del sonido por Autocorrelación
+function detectarTonoSimple(buffer, sampleRate) {
+  // 1. Ignorar si hay silencio o ruido muy bajo
+  let rms = 0;
+  for (let i = 0; i < buffer.length; i++) rms += buffer[i] * buffer[i];
+  if (Math.sqrt(rms / buffer.length) < 0.012) return -1;
 
-  yinBuf[0] = 1;
-  let runningSum = 0;
-  for (let tau = 1; tau < halfLen; tau++) {
-    let sum = 0;
-    for (let i = 0; i < halfLen; i++) {
-      const d = buffer[i] - buffer[i + tau];
-      sum += d * d;
+  // 2. Buscar el período de repetición fundamental (flauta soprano: ~450 Hz a ~2150 Hz)
+  const minPeriod = Math.floor(sampleRate / 2200);
+  const maxPeriod = Math.floor(sampleRate / 450);
+
+  let bestCorr = 0;
+  let bestPeriod = -1;
+
+  for (let period = minPeriod; period <= maxPeriod; period++) {
+    let corr = 0;
+    for (let i = 0; i < maxPeriod; i++) {
+      corr += buffer[i] * buffer[i + period];
     }
-    yinBuf[tau] = sum;
-    runningSum += yinBuf[tau];
-    yinBuf[tau] *= tau / runningSum;
-  }
-
-  const threshold = 0.15;
-  let tauEstimate = -1;
-  for (let tau = 2; tau < halfLen; tau++) {
-    if (yinBuf[tau] < threshold) {
-      while (tau + 1 < halfLen && yinBuf[tau + 1] < yinBuf[tau]) tau++;
-      tauEstimate = tau;
-      break;
+    if (corr > bestCorr) {
+      bestCorr = corr;
+      bestPeriod = period;
     }
   }
-  if (tauEstimate === -1) return -1;
 
-  const s0 = tauEstimate > 0 ? yinBuf[tauEstimate - 1] : yinBuf[tauEstimate];
-  const s1 = yinBuf[tauEstimate];
-  const s2 = tauEstimate + 1 < halfLen ? yinBuf[tauEstimate + 1] : yinBuf[tauEstimate];
-  let betterTau = tauEstimate;
-  const denom = 2 * s1 - s2 - s0;
-  if (denom !== 0) betterTau += (s2 - s0) / (2 * denom);
-
-  return sampleRate / betterTau;
+  // Si hay suficiente correlación, devolver la frecuencia encontrada
+  return bestPeriod > 0 ? sampleRate / bestPeriod : -1;
 }
 
-function freqToCents(f, fRef) {
-  return 1200 * Math.log2(f / fRef);
-}
-
+// Buscar cuál es la nota musical más cercana en nuestra tabla
 function matchNote(freq) {
-  let best = null, bestCents = Infinity;
+  let best = null, bestDiff = Infinity;
   for (const n of NOTE_TABLE) {
-    const c = Math.abs(freqToCents(freq, n.freq));
-    if (c < bestCents) { bestCents = c; best = n; }
+    const diff = Math.abs(freq - n.freq);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = n;
+    }
   }
-  if (bestCents <= 50) return { note: best };
+  // Tolerancia del 4% en frecuencia respecto a la nota teórica
+  if (best && bestDiff < best.freq * 0.04) return { note: best };
   return null;
 }
 
 let stableCount = 0;
 let lastCandidate = '';
 let lastSentNote  = '';
-const STABLE_THRESHOLD = 3;
 
 function detect() {
   if (!isListening) return;
   analyser.getFloatTimeDomainData(dataBuffer);
 
-  let rms = 0;
-  for (let i = 0; i < BUFFER_SIZE; i++) rms += dataBuffer[i] * dataBuffer[i];
-  rms = Math.sqrt(rms / BUFFER_SIZE);
+  const freq = detectarTonoSimple(dataBuffer, audioCtx.sampleRate);
+  if (freq > 400 && freq < 2200) {
+    const result = matchNote(freq);
+    if (result) {
+      const { note } = result;
 
-  if (rms > 0.01) {
-    const freq = yin(dataBuffer, audioCtx.sampleRate);
-    if (freq > 400 && freq < 2200) {
-      const result = matchNote(freq);
-      if (result) {
-        const { note } = result;
+      if (note.name === lastCandidate) {
+        stableCount++;
+      } else {
+        stableCount = 1;
+        lastCandidate = note.name;
+      }
 
-        if (note.name === lastCandidate) {
-          stableCount++;
-        } else {
-          stableCount = 1;
-          lastCandidate = note.name;
+      // Estabilizar tras 2 lecturas consecutivas para evitar parpadeos
+      if (stableCount >= 2) {
+        if (noteNameEl.textContent !== note.name) {
+          noteNameEl.textContent = note.name;
+          noteNameEl.classList.remove('pop');
+          void noteNameEl.offsetWidth;
+          noteNameEl.classList.add('pop');
         }
+        freqDisplay.textContent = freq.toFixed(1) + ' Hz';
 
-        if (stableCount >= STABLE_THRESHOLD) {
-          if (noteNameEl.textContent !== note.name) {
-            noteNameEl.textContent = note.name;
-            noteNameEl.classList.remove('pop');
-            void noteNameEl.offsetWidth;
-            noteNameEl.classList.add('pop');
-          }
-          freqDisplay.textContent = freq.toFixed(1) + ' Hz';
+        updateFingering(note.name);
 
-          updateFingering(note.name);
-
-          if (note.name !== lastSentNote) {
-            lastSentNote = note.name;
-            sendNote(note.name);
-          }
+        if (note.name !== lastSentNote) {
+          lastSentNote = note.name;
+          sendNote(note.name);
         }
       }
     }
