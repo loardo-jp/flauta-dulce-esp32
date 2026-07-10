@@ -189,10 +189,6 @@ header h1 {
   </header>
 
   <div class="top-controls">
-    <div class="status-badge">
-      <div class="status-dot" id="statusDot"></div>
-      <span id="statusText">Desconectado</span>
-    </div>
     <button class="btn-start" id="btnStart">INICIAR</button>
   </div>
 
@@ -428,15 +424,15 @@ function connectWS() {
 
   ws.onopen = () => {
     wsConnected = true;
-    statusDot.classList.add('on');
-    statusText.textContent = 'Conectado';
+    if (statusDot) statusDot.classList.add('on');
+    if (statusText) statusText.textContent = 'Conectado';
     ws.send(JSON.stringify({ type: 'register', device: 'browser' }));
   };
 
   ws.onclose = () => {
     wsConnected = false;
-    statusDot.classList.remove('on');
-    statusText.textContent = 'Desconectado';
+    if (statusDot) statusDot.classList.remove('on');
+    if (statusText) statusText.textContent = 'Desconectado';
     setTimeout(connectWS, 2000);
   };
 
