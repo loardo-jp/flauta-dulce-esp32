@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Flauta Dulce</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { font-size: 16px; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #0a0a0f;
+  color: #e0e0e8;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 0%, rgba(88,40,180,.25) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 100%, rgba(30,120,200,.15) 0%, transparent 60%);
+}
+
+/* ── Glass card ── */
+.card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 20px;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 24px;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* ── Header ── */
+header {
+  text-align: center;
+  padding: 32px 16px 8px;
+}
+header h1 {
+  font-size: 2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #a78bfa, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Status ── */
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0 20px;
+  font-size: .85rem;
+  color: #888;
+}
+.status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #ef4444;
+  transition: background .3s;
+  box-shadow: 0 0 6px #ef4444;
+}
+.status-dot.on {
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+/* ── Start button ── */
+.btn-start {
+  display: block;
+  margin: 0 auto 24px;
+  padding: 14px 48px;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #7c3aed, #3b82f6);
+  box-shadow: 0 4px 24px rgba(99,60,220,.35);
+  transition: transform .15s, box-shadow .15s;
+  position: relative;
+  overflow: hidden;
+}
+.btn-start:active { transform: scale(.96); }
+.btn-start.active {
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  box-shadow: 0 4px 24px rgba(239,68,68,.35);
+  animation: pulse-btn 1.8s ease-in-out infinite;
+}
+@keyframes pulse-btn {
+  0%,100% { box-shadow: 0 4px 24px rgba(239,68,68,.30); }
+  50%     { box-shadow: 0 4px 36px rgba(239,68,68,.55); }
+}
+
+/* ── Note display ── */
+.note-section { text-align: center; margin-bottom: 24px; }
+.note-name {
+  font-size: 4rem;
+  font-weight: 900;
+  min-height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s, opacity .15s;
+  text-shadow: 0 0 30px rgba(167,139,250,.5);
+}
+.note-name.pop {
+  animation: pop .25s ease;
+}
+@keyframes pop {
+  0%   { transform: scale(.85); opacity:.5; }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); opacity:1; }
+}
+.freq-display {
+  font-size: .95rem;
+  color: #777;
+  margin-top: 2px;
+}
+
+/* ── Tuning bar ── */
+.tuning-section { margin-bottom: 24px; }
+.tuning-label {
+  text-align: center;
+  font-size: .8rem;
+  color: #666;
+  margin-bottom: 6px;
+}
+.tuning-bar-wrap {
+  position: relative;
+  height: 8px;
+  background: rgba(255,255,255,.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.tuning-center {
+  position: absolute;
+  left: 50%; top: 0;
+  width: 2px; height: 100%;
+  background: rgba(255,255,255,.25);
+  transform: translateX(-1px);
+}
+.tuning-indicator {
+  position: absolute;
+  top: 0;
+  width: 12px; height: 100%;
+  background: #a78bfa;
+  border-radius: 4px;
+  left: 50%;
+  transform: translateX(-6px);
+  transition: left .12s ease;
+  box-shadow: 0 0 8px rgba(167,139,250,.6);
+}
+.tuning-cents {
+  text-align: center;
+  font-size: .75rem;
+  color: #666;
+  margin-top: 6px;
+}
+
+/* ── Fingering diagram ── */
+.fingering-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 20px 0 8px;
+}
+.hole-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hole-label {
+  font-size: .7rem;
+  color: #555;
+  width: 60px;
+  text-align: right;
+}
+.hole {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.15);
+  background: rgba(255,255,255,.04);
+  transition: background .25s, border-color .25s, box-shadow .25s;
+}
+.hole.closed {
+  background: #22c55e;
+  border-color: #22c55e;
+  box-shadow: 0 0 10px rgba(34,197,94,.45);
+}
+.hole.half {
+  background: radial-gradient(circle at 50% 50%, #ef4444 40%, rgba(255,255,255,.04) 41%);
+  border-color: #ef4444;
+  box-shadow: 0 0 10px rgba(239,68,68,.40);
+}
+.separator {
+  width: 40px;
+  height: 1px;
+  background: rgba(255,255,255,.1);
+  margin: 4px 0;
+  margin-left: 72px;
+}
+
+/* ── Utility ── */
+.gap { height: 16px; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <h1>🎵 Flauta Dulce</h1>
+</header>
+
+<!-- Status -->
+<div class="status-row">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">Desconectado</span>
+</div>
+
+<!-- Start / Stop -->
+<button class="btn-start" id="btnStart">INICIAR</button>
+
+<!-- Note & frequency -->
+<div class="card note-section">
+  <div class="note-name" id="noteName">—</div>
+  <div class="freq-display" id="freqDisplay">— Hz</div>
+</div>
+
+<div class="gap"></div>
+
+<!-- Tuning -->
+<div class="card tuning-section">
+  <div class="tuning-label">Afinación</div>
+  <div class="tuning-bar-wrap">
+    <div class="tuning-center"></div>
+    <div class="tuning-indicator" id="tuningInd"></div>
+  </div>
+  <div class="tuning-cents" id="tuningCents">0 cents</div>
+</div>
+
+<div class="gap"></div>
+
+<!-- Fingering -->
+<div class="card">
+  <div class="fingering-section" id="fingerDiagram"></div>
+</div>
+
+<div class="gap"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// Tabla de notas y frecuencias (flauta soprano, octavas 5-6-7)
+// ═══════════════════════════════════════════════════════
+const NOTE_TABLE = [
+  { name: "Do",    freq: 523.25  },
+  { name: "Do#",   freq: 554.37  },
+  { name: "Re",    freq: 587.33  },
+  { name: "Re#",   freq: 622.25  },
+  { name: "Mi",    freq: 659.26  },
+  { name: "Fa",    freq: 698.46  },
+  { name: "Fa#",   freq: 739.99  },
+  { name: "Sol",   freq: 783.99  },
+  { name: "Sol#",  freq: 830.61  },
+  { name: "La",    freq: 880.00  },
+  { name: "La#",   freq: 932.33  },
+  { name: "Si",    freq: 987.77  },
+  { name: "Do''",  freq: 1046.50 },
+  { name: "Do#''", freq: 1108.73 },
+  { name: "Re''",  freq: 1174.66 },
+  { name: "Re#''", freq: 1244.51 },
+  { name: "Mi''",  freq: 1318.51 },
+  { name: "Fa''",  freq: 1396.91 },
+  { name: "Fa#''", freq: 1479.98 },
+  { name: "Sol''", freq: 1567.98 },
+  { name: "Sol#''",freq: 1661.22 },
+  { name: "La''",  freq: 1760.00 },
+  { name: "La#''", freq: 1864.66 },
+  { name: "Si''",  freq: 1975.53 },
+  { name: "Do'''", freq: 2093.00 }
+];
+
+// ═══════════════════════════════════════════════════════
+// Tabla de digitación  [h1,h2,h3,h4,h5,h6,h7,h8(portavoz)]
+// 0 = abierto, 1 = cerrado, 2 = medio cerrado
+// ═══════════════════════════════════════════════════════
+const FINGERINGS = {
+  "Do":     [1,1,1,1,1,1,1,1],
+  "Do#":    [1,1,1,1,1,1,2,1],
+  "Re":     [1,1,1,1,1,1,0,1],
+  "Re#":    [1,1,1,1,1,2,0,1],
+  "Mi":     [1,1,1,1,1,0,0,1],
+  "Fa":     [1,1,1,1,0,0,0,1],
+  "Fa#":    [1,1,1,0,1,1,1,1],
+  "Sol":    [1,1,1,0,0,0,0,1],
+  "Sol#":   [1,1,0,1,1,0,0,1],
+  "La":     [1,1,0,0,0,0,0,1],
+  "La#":    [1,0,1,0,0,0,0,1],
+  "Si":     [1,0,0,0,0,0,0,1],
+  "Do''":   [0,1,0,0,0,0,0,1],
+  "Do#''":  [1,1,0,0,0,0,0,0],
+  "Re''":   [0,1,0,0,0,0,0,0],
+  "Re#''":  [1,1,1,1,1,2,0,2],
+  "Mi''":   [1,1,1,1,1,1,1,1],
+  "Fa''":   [1,1,1,1,0,0,0,2],
+  "Fa#''":  [1,1,1,0,1,0,0,2],
+  "Sol''":  [1,1,1,0,0,0,0,2],
+  "Sol#''": [1,1,0,1,0,0,0,2],
+  "La''":   [1,1,0,0,0,0,0,2],
+  "La#''":  [1,1,0,1,1,1,0,2],
+  "Si''":   [1,1,0,1,1,0,0,2],
+  "Do'''":  [1,0,0,1,0,0,0,2]
+};
+
+// ═══════════════════════════════════════════════════════
+// Elementos del DOM
+// ═══════════════════════════════════════════════════════
+const statusDot   = document.getElementById('statusDot');
+const statusText  = document.getElementById('statusText');
+const btnStart    = document.getElementById('btnStart');
+const noteNameEl  = document.getElementById('noteName');
+const freqDisplay = document.getElementById('freqDisplay');
+const tuningInd   = document.getElementById('tuningInd');
+const tuningCents = document.getElementById('tuningCents');
+const fingerDiag  = document.getElementById('fingerDiagram');
+
+// ═══════════════════════════════════════════════════════
+// Construir diagrama de digitación
+// Orden visual: portavoz (h8) arriba, luego h1..h7
+// ═══════════════════════════════════════════════════════
+const holeLabels = ['Portavoz','1','2','3','4','5','6','7'];
+// Mapeo: posición visual → índice en el array de digitación
+// Visual 0 = h8 (índice 7), Visual 1..7 = h1..h7 (índices 0..6)
+const holeElements = [];
+
+holeLabels.forEach((label, i) => {
+  if (i === 1) {
+    // Separador entre portavoz y los demás
+    const sep = document.createElement('div');
+    sep.className = 'separator';
+    fingerDiag.appendChild(sep);
+  }
+  const row = document.createElement('div');
+  row.className = 'hole-row';
+  const lbl = document.createElement('span');
+  lbl.className = 'hole-label';
+  lbl.textContent = label;
+  const circle = document.createElement('div');
+  circle.className = 'hole';
+  row.appendChild(lbl);
+  row.appendChild(circle);
+  fingerDiag.appendChild(row);
+  holeElements.push(circle);
+});
+
+function updateFingering(noteName) {
+  const fg = FINGERINGS[noteName];
+  holeElements.forEach((el, i) => {
+    // i=0 → portavoz (h8, index 7), i=1..7 → h1..h7 (index 0..6)
+    const idx = i === 0 ? 7 : i - 1;
+    const val = fg ? fg[idx] : -1;
+    el.classList.remove('closed','half');
+    if (val === 1) el.classList.add('closed');
+    else if (val === 2) el.classList.add('half');
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// WebSocket
+// ═══════════════════════════════════════════════════════
+let ws = null;
+let wsConnected = false;
+
+function connectWS() {
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  ws = new WebSocket(`${proto}://${location.host}/ws`);
+
+  ws.onopen = () => {
+    wsConnected = true;
+    statusDot.classList.add('on');
+    statusText.textContent = 'Conectado';
+    ws.send(JSON.stringify({ type: 'register', device: 'browser' }));
+  };
+
+  ws.onclose = () => {
+    wsConnected = false;
+    statusDot.classList.remove('on');
+    statusText.textContent = 'Desconectado';
+    // Reintentar en 2 s
+    setTimeout(connectWS, 2000);
+  };
+
+  ws.onerror = () => ws.close();
+}
+connectWS();
+
+function sendNote(name) {
+  if (ws && wsConnected) ws.send(name);
+}
+
+// ═══════════════════════════════════════════════════════
+// Audio & YIN pitch detection
+// ═══════════════════════════════════════════════════════
+let audioCtx, analyser, micStream, isListening = false;
+const BUFFER_SIZE = 2048;
+let dataBuffer = new Float32Array(BUFFER_SIZE);
+
+// YIN Algorithm
+function yin(buffer, sampleRate) {
+  const halfLen = Math.floor(buffer.length / 2);
+  const yinBuf = new Float32Array(halfLen);
+
+  // Paso 1 & 2: Diferencia cuadrática y normalización acumulativa
+  yinBuf[0] = 1;
+  let runningSum = 0;
+  for (let tau = 1; tau < halfLen; tau++) {
+    let sum = 0;
+    for (let i = 0; i < halfLen; i++) {
+      const d = buffer[i] - buffer[i + tau];
+      sum += d * d;
+    }
+    yinBuf[tau] = sum;
+    runningSum += yinBuf[tau];
+    yinBuf[tau] *= tau / runningSum;
+  }
+
+  // Paso 3: Umbral absoluto
+  const threshold = 0.15;
+  let tauEstimate = -1;
+  for (let tau = 2; tau < halfLen; tau++) {
+    if (yinBuf[tau] < threshold) {
+      while (tau + 1 < halfLen && yinBuf[tau + 1] < yinBuf[tau]) tau++;
+      tauEstimate = tau;
+      break;
+    }
+  }
+  if (tauEstimate === -1) return -1;
+
+  // Paso 4: Interpolación parabólica
+  const s0 = tauEstimate > 0 ? yinBuf[tauEstimate - 1] : yinBuf[tauEstimate];
+  const s1 = yinBuf[tauEstimate];
+  const s2 = tauEstimate + 1 < halfLen ? yinBuf[tauEstimate + 1] : yinBuf[tauEstimate];
+  let betterTau = tauEstimate;
+  const denom = 2 * s1 - s2 - s0;
+  if (denom !== 0) betterTau += (s2 - s0) / (2 * denom);
+
+  return sampleRate / betterTau;
+}
+
+// Conversión a cents
+function freqToCents(f, fRef) {
+  return 1200 * Math.log2(f / fRef);
+}
+
+// Encontrar nota más cercana (±50 cents)
+function matchNote(freq) {
+  let best = null, bestCents = Infinity;
+  for (const n of NOTE_TABLE) {
+    const c = Math.abs(freqToCents(freq, n.freq));
+    if (c < bestCents) { bestCents = c; best = n; }
+  }
+  if (bestCents <= 50) {
+    return { note: best, cents: freqToCents(freq, best.freq) };
+  }
+  return null;
+}
+
+// ── Estado de estabilización ──
+let stableCount = 0;
+let lastCandidate = '';
+let lastSentNote  = '';
+const STABLE_THRESHOLD = 3;
+
+// ── Bucle de detección ──
+function detect() {
+  if (!isListening) return;
+  analyser.getFloatTimeDomainData(dataBuffer);
+
+  // Verificar si hay señal significativa
+  let rms = 0;
+  for (let i = 0; i < BUFFER_SIZE; i++) rms += dataBuffer[i] * dataBuffer[i];
+  rms = Math.sqrt(rms / BUFFER_SIZE);
+
+  if (rms > 0.01) {
+    const freq = yin(dataBuffer, audioCtx.sampleRate);
+    if (freq > 400 && freq < 2200) {
+      const result = matchNote(freq);
+      if (result) {
+        const { note, cents } = result;
+
+        // Estabilización
+        if (note.name === lastCandidate) {
+          stableCount++;
+        } else {
+          stableCount = 1;
+          lastCandidate = note.name;
+        }
+
+        if (stableCount >= STABLE_THRESHOLD) {
+          // Actualizar UI
+          if (noteNameEl.textContent !== note.name) {
+            noteNameEl.textContent = note.name;
+            noteNameEl.classList.remove('pop');
+            void noteNameEl.offsetWidth; // trigger reflow
+            noteNameEl.classList.add('pop');
+          }
+          freqDisplay.textContent = freq.toFixed(1) + ' Hz';
+
+          // Tuning bar (mapeamos ±50 cents → 0%-100%)
+          const pct = 50 + (cents / 50) * 50;
+          tuningInd.style.left = Math.max(0, Math.min(100, pct)) + '%';
+          const sign = cents >= 0 ? '+' : '';
+          tuningCents.textContent = sign + cents.toFixed(1) + ' cents';
+
+          updateFingering(note.name);
+
+          // Enviar por WS solo si cambió
+          if (note.name !== lastSentNote) {
+            lastSentNote = note.name;
+            sendNote(note.name);
+          }
+        }
+      }
+    }
+  }
+
+  requestAnimationFrame(detect);
+}
+
+// ═══════════════════════════════════════════════════════
+// Botón iniciar / detener
+// ═══════════════════════════════════════════════════════
+btnStart.addEventListener('click', async () => {
+  if (!isListening) {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const source = audioCtx.createMediaStreamSource(micStream);
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = BUFFER_SIZE;
+      source.connect(analyser);
+      dataBuffer = new Float32Array(BUFFER_SIZE);
+
+      isListening = true;
+      btnStart.textContent = 'DETENER';
+      btnStart.classList.add('active');
+      requestAnimationFrame(detect);
+    } catch (e) {
+      alert('No se pudo acceder al micrófono: ' + e.message);
+    }
+  } else {
+    isListening = false;
+    if (micStream) micStream.getTracks().forEach(t => t.stop());
+    if (audioCtx) audioCtx.close();
+    btnStart.textContent = 'INICIAR';
+    btnStart.classList.remove('active');
+    noteNameEl.textContent = '—';
+    freqDisplay.textContent = '— Hz';
+    tuningInd.style.left = '50%';
+    tuningCents.textContent = '0 cents';
+    updateFingering(null);
+    stableCount = 0;
+    lastCandidate = '';
+    lastSentNote = '';
+  }
+});
+</script>
+</body>
+</html>
