@@ -13,7 +13,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <WiFi.h>
-#include <WebSocketsClient_Generic.h>
+#include <WebSocketsClient.h>
 // Necesario para deshabilitar el detector de bajo voltaje (brownout)
 #include "soc/soc.h"
 #include "soc/rtc_cntl_reg.h"
