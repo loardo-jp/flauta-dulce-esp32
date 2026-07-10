@@ -3,524 +3,429 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Flauta Dulce - Dispositivo Educativo</title>
+<title>Flauta Dulce - Taller Rústico</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 /* ── Reset & Base ── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { font-size: 16px; }
 
 :root {
-  --wood-darkest: #130b07;
-  --wood-dark: #22140d;
-  --wood-medium: #3b2315;
-  --wood-warm: #5c3620;
-  --wood-light: #875231;
-  --amber-gold: #f59e0b;
-  --amber-glow: rgba(245, 158, 11, 0.35);
-  --green-glow: #10b981;
-  --red-glow: #ef4444;
-  --text-cream: #fef3c7;
-  --text-muted: #d4b896;
+  --wood-bg: #160d07;
+  --wood-panel: #26160c;
+  --wood-border: #63381a;
+  --wood-carved: #0f0804;
+  --amber-bright: #f59e0b;
+  --parchment: #fef6e4;
+  --parchment-dim: #d8c29d;
+  --green-led: #10b981;
+  --red-led: #ef4444;
 }
 
 body {
   font-family: 'Outfit', sans-serif;
-  background-color: var(--wood-darkest);
-  color: var(--text-cream);
+  background-color: var(--wood-bg);
+  color: var(--parchment);
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
   overflow-x: hidden;
-  /* Fondo estilo madera noble con gradiente cálido ambiental */
+  /* Fondo rústico vetado de madera oscura y cálida */
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(180, 100, 40, 0.18) 0%, transparent 65%),
-    radial-gradient(circle at 10% 90%, rgba(130, 70, 30, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 50% 10%, rgba(210, 110, 40, 0.15) 0%, transparent 75%),
     repeating-linear-gradient(
-      92deg,
-      rgba(255, 255, 255, 0.012) 0px,
-      rgba(255, 255, 255, 0.012) 2px,
-      transparent 2px,
-      transparent 8px
+      0deg,
+      rgba(0, 0, 0, 0.18) 0px,
+      rgba(0, 0, 0, 0.18) 1px,
+      transparent 1px,
+      transparent 14px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 3px,
+      transparent 3px,
+      transparent 12px
     );
 }
 
-/* ── Contenedor principal ── */
 .app-container {
   width: 100%;
-  max-width: 520px;
-  padding: 16px 16px 40px;
+  max-width: 820px;
+  padding: 20px 16px 40px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* ── Tarjetas con estética madera noble & cristal cálido ── */
-.card {
-  background: linear-gradient(145deg, rgba(59, 35, 21, 0.75), rgba(34, 20, 13, 0.85));
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  border-radius: 22px;
-  box-shadow:
-    0 12px 32px rgba(10, 5, 2, 0.65),
-    inset 0 1px 1px rgba(254, 243, 199, 0.15);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  padding: 24px;
-  width: 100%;
-  margin-bottom: 18px;
-}
-
-/* ── Cabecera ── */
+/* ── Cabecera Rústica ── */
 header {
-  text-align: center;
-  padding: 16px 8px 6px;
-}
-header h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.2rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #fffbeb 0%, #fcd34d 55%, #d97706 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  text-shadow: 0 4px 20px rgba(245, 158, 11, 0.2);
-}
-header p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-}
-
-/* ── Estado del WebSocket ── */
-.status-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin: 10px 0 18px;
-  font-size: 0.82rem;
-  color: var(--text-muted);
-  background: rgba(19, 11, 7, 0.6);
-  padding: 6px 14px;
-  border-radius: 99px;
-  border: 1px solid rgba(245, 158, 11, 0.18);
-}
-.status-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
-  background: #ef4444;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 6px #ef4444;
-}
-.status-dot.on {
-  background: #10b981;
-  box-shadow: 0 0 10px #10b981;
-}
-
-/* ── Botón Iniciar ── */
-.btn-start {
-  display: block;
-  margin: 0 auto 20px;
-  padding: 15px 44px;
-  font-family: 'Outfit', sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  border: 1px solid rgba(254, 243, 199, 0.3);
-  border-radius: 16px;
-  cursor: pointer;
-  color: #fffbeb;
-  background: linear-gradient(135deg, #b45309 0%, #78350f 50%, #451a03 100%);
-  box-shadow:
-    0 8px 24px rgba(180, 83, 9, 0.4),
-    inset 0 1px 1px rgba(255, 255, 255, 0.25);
-  transition: transform 0.15s, box-shadow 0.15s, background 0.3s;
-}
-.btn-start:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(217, 119, 6, 0.5);
-}
-.btn-start:active { transform: scale(0.97); }
-.btn-start.active {
-  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
-  border-color: rgba(248, 113, 113, 0.4);
-  box-shadow: 0 8px 26px rgba(239, 68, 68, 0.45);
-  animation: pulse-btn 1.8s ease-in-out infinite;
-}
-@keyframes pulse-btn {
-  0%,100% { box-shadow: 0 6px 20px rgba(239,68,68,0.35); }
-  50%     { box-shadow: 0 8px 32px rgba(239,68,68,0.65); }
-}
-
-/* ── Tarjeta Nota & Frecuencia ── */
-.note-section {
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.note-section::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(245,158,11,0.18) 0%, transparent 70%);
-  pointer-events: none;
-}
-.note-name {
-  font-family: 'Playfair Display', serif;
-  font-size: 4.5rem;
-  font-weight: 700;
-  min-height: 5.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fef3c7;
-  text-shadow: 0 0 25px rgba(245, 158, 11, 0.6);
-  transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-.note-name.pop {
-  animation: pop 0.28s ease;
-}
-@keyframes pop {
-  0%   { transform: scale(0.82); opacity: 0.6; }
-  60%  { transform: scale(1.08); }
-  100% { transform: scale(1); opacity: 1; }
-}
-.freq-display {
-  font-size: 0.95rem;
-  color: #fcd34d;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-}
-
-/* ── Afinación ── */
-.tuning-label {
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  margin-bottom: 8px;
-}
-.tuning-bar-wrap {
-  position: relative;
-  height: 10px;
-  background: rgba(19, 11, 7, 0.7);
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  border-radius: 99px;
-  overflow: hidden;
-}
-.tuning-center {
-  position: absolute;
-  left: 50%; top: 0;
-  width: 2px; height: 100%;
-  background: rgba(254, 243, 199, 0.45);
-  transform: translateX(-1px);
-}
-.tuning-indicator {
-  position: absolute;
-  top: 1px;
-  width: 14px; height: 8px;
-  background: linear-gradient(90deg, #f59e0b, #fbbf24);
-  border-radius: 99px;
-  left: 50%;
-  transform: translateX(-7px);
-  transition: left 0.12s ease;
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.8);
-}
-.tuning-cents {
-  text-align: center;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-  margin-top: 7px;
-}
-
-/* ── Flauta Realista Sección ── */
-.flute-card-header {
   text-align: center;
   margin-bottom: 14px;
 }
-.flute-card-header h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.35rem;
-  color: #fffbeb;
+header h1 {
+  font-family: 'Cinzel', serif;
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: var(--parchment);
+  letter-spacing: 2px;
+  text-shadow: 0 3px 12px rgba(0, 0, 0, 0.8), 0 0 25px rgba(245, 158, 11, 0.25);
 }
-.flute-card-header p {
-  font-size: 0.78rem;
-  color: var(--text-muted);
+header p {
+  font-size: 0.85rem;
+  color: var(--parchment-dim);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-top: 4px;
 }
 
-/* Leyenda de colores */
-.legend-row {
+/* ── Controles superiores (Estado + Botón) ── */
+.top-controls {
   display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
-.legend-item {
+
+.status-badge {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.76rem;
-  color: var(--text-cream);
+  gap: 8px;
+  background: rgba(15, 8, 4, 0.85);
+  border: 1px solid var(--wood-border);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  color: var(--parchment-dim);
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.6);
 }
-.legend-dot {
-  width: 12px; height: 12px;
+.status-dot {
+  width: 10px; height: 10px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.3);
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
+  transition: background 0.3s;
 }
-.legend-dot.green { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.6); }
-.legend-dot.red {
-  background: linear-gradient(90deg, #ef4444 50%, #29150d 50%);
-  border-color: #ef4444;
+.status-dot.on {
+  background: var(--green-led);
+  box-shadow: 0 0 10px var(--green-led);
 }
-.legend-dot.open { background: #150a06; border-color: #875231; }
 
-/* Contenedor del SVG realista */
-.flute-stage {
+/* Botón rústico tallado */
+.btn-start {
+  padding: 12px 36px;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #fff;
+  background: linear-gradient(180deg, #9a5323 0%, #5d2e10 100%);
+  border: 2px solid #b87339;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.25);
+  transition: all 0.2s ease;
+}
+.btn-start:hover {
+  background: linear-gradient(180deg, #b0622d 0%, #6e3715 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.7);
+}
+.btn-start:active { transform: scale(0.97); }
+.btn-start.active {
+  background: linear-gradient(180deg, #991b1b 0%, #5f1010 100%);
+  border-color: #f87171;
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.45);
+}
+
+/* ── Panel Principal LADO A LADO (Nota en vivo a la izquierda, Flauta a la derecha) ── */
+.workshop-stage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  align-items: stretch;
+}
+
+@media (max-width: 640px) {
+  .workshop-stage {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Marco rústico artesanal para tarjetas ── */
+.rustic-frame {
+  background: linear-gradient(145deg, rgba(42, 24, 13, 0.92), rgba(26, 14, 7, 0.95));
+  border: 2px solid var(--wood-border);
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.7),
+    inset 0 1px 3px rgba(255, 255, 255, 0.08);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
-  padding: 10px 0;
 }
 
-/* Estilos para los orificios dentro del SVG */
-.hole-glow {
-  transition: fill 0.25s ease, filter 0.25s ease, stroke 0.25s ease;
+/* ── Tarjeta Izquierda: Nota Detectada ── */
+.note-panel {
+  text-align: center;
+  min-height: 380px;
+  justify-content: center;
 }
-.hole-core {
-  transition: fill 0.25s ease;
+.note-panel-title {
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  color: var(--parchment-dim);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(99, 56, 26, 0.6);
+  padding-bottom: 8px;
+  width: 80%;
+}
+
+/* Marco interior tallado para la nota */
+.note-carved-box {
+  background: rgba(14, 7, 4, 0.85);
+  border: 2px inset #4a2813;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 250px;
+  padding: 30px 16px;
+  box-shadow: inset 0 6px 16px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-name {
+  font-family: 'Cinzel', serif;
+  font-size: 5rem;
+  font-weight: 800;
+  color: var(--amber-bright);
+  text-shadow: 0 0 25px rgba(245, 158, 11, 0.5);
+  min-height: 5.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.18s ease;
+}
+.note-name.pop {
+  animation: pop 0.25s ease;
+}
+@keyframes pop {
+  0%   { transform: scale(0.85); opacity: 0.6; }
+  60%  { transform: scale(1.08); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.freq-display {
+  font-size: 1.05rem;
+  color: var(--parchment-dim);
+  margin-top: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* Leyenda inferior rústica */
+.legend-mini {
+  display: flex;
+  gap: 14px;
+  margin-top: 24px;
+  font-size: 0.78rem;
+  color: var(--parchment-dim);
+}
+.dot-legend {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+/* ── Tarjeta Derecha: Flauta Realista ── */
+.flute-panel {
+  padding: 18px 12px;
+}
+.flute-svg-wrap {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>
 </head>
 <body>
 
 <div class="app-container">
-  <!-- Cabecera -->
+  <!-- Cabecera Rústica -->
   <header>
-    <h1>Flauta Dulce</h1>
-    <p>Educador Interactivo ESP32</p>
+    <h1>🎵 Flauta Dulce</h1>
+    <p>Taller Educativo de Digitación</p>
   </header>
 
-  <!-- Estado -->
-  <div class="status-row">
-    <div class="status-dot" id="statusDot"></div>
-    <span id="statusText">Desconectado del servidor</span>
-  </div>
-
-  <!-- Botón Iniciar -->
-  <button class="btn-start" id="btnStart">INICIAR ESCUCHA</button>
-
-  <!-- Tarjeta de Nota y Frecuencia -->
-  <div class="card note-section">
-    <div class="note-name" id="noteName">—</div>
-    <div class="freq-display" id="freqDisplay">— Hz</div>
-  </div>
-
-  <!-- Afinador -->
-  <div class="card">
-    <div class="tuning-label">Precisión de Afinación</div>
-    <div class="tuning-bar-wrap">
-      <div class="tuning-center"></div>
-      <div class="tuning-indicator" id="tuningInd"></div>
+  <!-- Controles y Estado -->
+  <div class="top-controls">
+    <div class="status-badge">
+      <div class="status-dot" id="statusDot"></div>
+      <span id="statusText">Desconectado</span>
     </div>
-    <div class="tuning-cents" id="tuningCents">0 cents</div>
+    <button class="btn-start" id="btnStart">INICIAR</button>
   </div>
 
-  <!-- Diagrama de Flauta Realista -->
-  <div class="card">
-    <div class="flute-card-header">
-      <h2>Digitación en la Flauta</h2>
-      <p>Posición real de los dedos para flauta soprano</p>
-    </div>
+  <!-- Escenario Principal Lado a Lado -->
+  <div class="workshop-stage">
+    <!-- Panel Izquierdo: Nota detectada en gran formato -->
+    <div class="rustic-frame note-panel">
+      <div class="note-panel-title">Nota en Tiempo Real</div>
+      <div class="note-carved-box">
+        <div class="note-name" id="noteName">—</div>
+        <div class="freq-display" id="freqDisplay">— Hz</div>
+      </div>
 
-    <!-- Leyenda -->
-    <div class="legend-row">
-      <div class="legend-item">
-        <span class="legend-dot green"></span> Tapado (Verde)
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot red"></span> Medio tapado (Rojo)
-      </div>
-      <div class="legend-item">
-        <span class="legend-dot open"></span> Abierto
+      <!-- Leyenda rápida -->
+      <div class="legend-mini">
+        <span><span class="dot-legend" style="background:#10b981;"></span>Tapado</span>
+        <span><span class="dot-legend" style="background:#ef4444;"></span>Medio</span>
+        <span><span class="dot-legend" style="background:#150a06; border:1px solid #875231;"></span>Abierto</span>
       </div>
     </div>
 
-    <!-- Flauta Dulce Realista en SVG -->
-    <div class="flute-stage">
-      <svg id="recorderSvg" viewBox="0 0 280 480" width="100%" style="max-width: 320px; height: auto;">
-        <defs>
-          <!-- Gradiente de madera noble para el cuerpo de la flauta -->
-          <linearGradient id="woodGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#2c160c" />
-            <stop offset="22%" stop-color="#6e3c23" />
-            <stop offset="48%" stop-color="#9e5c38" />
-            <stop offset="75%" stop-color="#59301a" />
-            <stop offset="100%" stop-color="#241108" />
-          </linearGradient>
+    <!-- Panel Derecho: Flauta Realista al lado de la nota -->
+    <div class="rustic-frame flute-panel">
+      <div class="flute-svg-wrap">
+        <svg id="recorderSvg" viewBox="0 0 250 440" width="100%" style="max-width: 270px; height: auto;">
+          <defs>
+            <!-- Gradiente rústico de madera torneada -->
+            <linearGradient id="woodGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#231107" />
+              <stop offset="25%" stop-color="#5a3118" />
+              <stop offset="50%" stop-color="#874e2b" />
+              <stop offset="78%" stop-color="#4d2712" />
+              <stop offset="100%" stop-color="#1d0d05" />
+            </linearGradient>
 
-          <!-- Gradiente para juntas torneadas ornamentales (acabado marfil/madera oscura) -->
-          <linearGradient id="ringGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#4a2613" />
-            <stop offset="45%" stop-color="#c8966e" />
-            <stop offset="100%" stop-color="#3b1d0e" />
-          </linearGradient>
+            <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#3b1d0e" />
+              <stop offset="50%" stop-color="#ba8658" />
+              <stop offset="100%" stop-color="#2a1409" />
+            </linearGradient>
 
-          <!-- Gradiente para el interior del bisel (ventana) -->
-          <linearGradient id="windowShadow" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#0f0703" />
-            <stop offset="100%" stop-color="#29150c" />
-          </linearGradient>
+            <filter id="glowG" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
 
-          <!-- Brillo de LED verde -->
-          <filter id="glowGreen" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
+            <filter id="glowR" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3.5" result="coloredBlur"/>
+              <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
 
-          <!-- Brillo de LED rojo -->
-          <filter id="glowRed" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-        </defs>
+          <!-- ── VISTA TRASERA (Portavoz - P) ── -->
+          <g transform="translate(18, 55)">
+            <path d="M 24,0 C 36,0 38,12 38,24 L 35,95 L 13,95 L 10,24 C 10,12 12,0 24,0 Z" fill="url(#woodGrad)" stroke="#160803" stroke-width="1.5" />
+            <rect x="11" y="24" width="26" height="5" rx="1.5" fill="url(#ringGrad)" />
+            
+            <text x="24" y="-8" text-anchor="middle" fill="#d8c29d" font-family="'Cinzel', serif" font-size="11" font-weight="700">P</text>
 
-        <!-- ══════ COLUMNA IZQUIERDA: VISTA TRASERA (PORTAVOZ / THUMB HOLE) ══════ -->
-        <g id="thumbView" transform="translate(10, 50)">
-          <!-- Mini cuerpo trasero -->
-          <path d="M 30,0 C 45,0 48,15 48,30 L 44,110 L 16,110 L 12,30 C 12,15 15,0 30,0 Z" fill="url(#woodGradient)" stroke="#1a0b05" stroke-width="1.5" />
-          <!-- Anillo superior -->
-          <rect x="14" y="30" width="32" height="6" rx="2" fill="url(#ringGradient)" />
-          
-          <!-- Etiqueta Portavoz -->
-          <text x="30" y="-12" text-anchor="middle" fill="#fcd34d" font-size="11" font-weight="700">PORTAVOZ</text>
-          <text x="30" y="-1" text-anchor="middle" fill="#d4b896" font-size="9">(Atrás - 0)</text>
-
-          <!-- Orificio Portavoz (h8 en el firmware) -->
-          <circle id="hole_0_outer" cx="30" cy="65" r="11" fill="#150a06" stroke="#875231" stroke-width="2" />
-          <path id="hole_0_half" d="M 30,54 A 11,11 0 0 1 30,76 Z" fill="transparent" />
-          <circle id="hole_0_inner" cx="30" cy="65" r="6" fill="#0d0502" />
-        </g>
-
-        <!-- Línea conectora decorativa entre vista trasera y flauta frontal -->
-        <path d="M 68,115 C 85,115 95,115 108,115" stroke="rgba(245,158,11,0.35)" stroke-width="1" stroke-dasharray="3,3" />
-
-        <!-- ══════ COLUMNA CENTRO/DERECHA: CUERPO REALISTA DE LA FLAUTA (VISTA FRONTAL) ══════ -->
-        <g id="frontFlute">
-          <!-- CABEZA (Headjoint) -->
-          <!-- Boquilla superior curvada -->
-          <path d="M 125,12 C 133,10 147,10 155,12 L 162,55 L 118,55 Z" fill="url(#woodGradient)" stroke="#190c05" stroke-width="1.5" />
-          <path d="M 130,12 Q 140,16 150,12" stroke="rgba(255,255,255,0.25)" stroke-width="2" fill="none" />
-          
-          <!-- Ventana y Labio (Bisel) -->
-          <rect x="131" y="32" width="18" height="13" rx="2" fill="url(#windowShadow)" stroke="#522b16" stroke-width="1" />
-          <polygon points="131,45 149,45 140,36" fill="#8b4d2b" />
-
-          <!-- Anillo ornamental de unión cabeza-cuerpo -->
-          <rect x="116" y="55" width="48" height="10" rx="3" fill="url(#ringGradient)" stroke="#231006" stroke-width="1" />
-
-          <!-- CUERPO PRINCIPAL (Middle joint & Foot joint) -->
-          <path d="M 119,65 L 161,65 L 154,420 L 126,420 Z" fill="url(#woodGradient)" stroke="#190c05" stroke-width="1.5" />
-
-          <!-- Anillo inferior y Pabellón (Campana) -->
-          <rect x="123" y="418" width="34" height="8" rx="2" fill="url(#ringGradient)" stroke="#231006" stroke-width="1" />
-          <path d="M 124,426 C 117,445 113,458 113,466 L 167,466 C 167,458 163,445 156,426 Z" fill="url(#woodGradient)" stroke="#190c05" stroke-width="1.5" />
-          <!-- Apertura inferior de la campana -->
-          <ellipse cx="140" cy="466" rx="27" ry="5" fill="#130803" stroke="#482512" stroke-width="1.5" />
-
-          <!-- Brillo longitudinal en la madera -->
-          <path d="M 135,66 L 137,418" stroke="rgba(255,255,255,0.12)" stroke-width="3" />
-
-          <!-- ── ORIFICIOS FRONTALES (1 al 7) CON ETIQUETAS E INDICADORES ── -->
-          
-          <!-- Orificio 1 -->
-          <g transform="translate(140, 95)">
-            <circle id="hole_1_outer" r="10.5" fill="#150a06" stroke="#875231" stroke-width="2" />
-            <path id="hole_1_half" d="M 0,-10.5 A 10.5,10.5 0 0 1 0,10.5 Z" fill="transparent" />
-            <circle id="hole_1_inner" r="5.5" fill="#0d0502" />
-            <line x1="16" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
-            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">1</text>
-            <text x="64" y="3" fill="#d4b896" font-size="10">Índice</text>
+            <circle id="hole_0_outer" cx="24" cy="56" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+            <path id="hole_0_half" d="M 24,46 A 10,10 0 0 1 24,66 Z" fill="transparent" />
+            <circle id="hole_0_inner" cx="24" cy="56" r="5" fill="#0d0502" />
           </g>
 
-          <!-- Orificio 2 -->
-          <g transform="translate(140, 140)">
-            <circle id="hole_2_outer" r="10.5" fill="#150a06" stroke="#875231" stroke-width="2" />
-            <path id="hole_2_half" d="M 0,-10.5 A 10.5,10.5 0 0 1 0,10.5 Z" fill="transparent" />
-            <circle id="hole_2_inner" r="5.5" fill="#0d0502" />
-            <line x1="16" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
-            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">2</text>
-            <text x="64" y="3" fill="#d4b896" font-size="10">Medio</text>
-          </g>
+          <!-- Línea divisoria sutil -->
+          <line x1="68" y1="30" x2="68" y2="410" stroke="rgba(135, 82, 49, 0.25)" stroke-width="1" stroke-dasharray="4,4" />
 
-          <!-- Orificio 3 -->
-          <g transform="translate(140, 185)">
-            <circle id="hole_3_outer" r="10.5" fill="#150a06" stroke="#875231" stroke-width="2" />
-            <path id="hole_3_half" d="M 0,-10.5 A 10.5,10.5 0 0 1 0,10.5 Z" fill="transparent" />
-            <circle id="hole_3_inner" r="5.5" fill="#0d0502" />
-            <line x1="16" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
-            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">3</text>
-            <text x="64" y="3" fill="#d4b896" font-size="10">Anular</text>
-          </g>
+          <!-- ── VISTA FRONTAL CUERPO FLAUTA ── -->
+          <g transform="translate(45, 0)">
+            <!-- Cabeza -->
+            <path d="M 98,10 C 105,8 116,8 123,10 L 129,48 L 92,48 Z" fill="url(#woodGrad)" stroke="#160803" stroke-width="1.5" />
+            <rect x="102" y="27" width="16" height="11" rx="2" fill="#120703" stroke="#4d2712" stroke-width="1" />
+            <polygon points="102,38 118,38 110,31" fill="#7d4526" />
+            <rect x="90" y="48" width="41" height="8" rx="2" fill="url(#ringGrad)" stroke="#160803" stroke-width="1" />
 
-          <!-- Orificio 4 -->
-          <g transform="translate(140, 230)">
-            <circle id="hole_4_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
-            <path id="hole_4_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
-            <circle id="hole_4_inner" r="5" fill="#0d0502" />
-            <line x1="15" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
-            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">4</text>
-            <text x="64" y="3" fill="#d4b896" font-size="10">Índice der.</text>
-          </g>
+            <!-- Cuerpo y pie -->
+            <path d="M 93,56 L 128,56 L 122,382 L 99,382 Z" fill="url(#woodGrad)" stroke="#160803" stroke-width="1.5" />
+            <rect x="96" y="380" width="29" height="7" rx="2" fill="url(#ringGrad)" stroke="#160803" stroke-width="1" />
+            <path d="M 97,387 C 91,404 88,414 88,422 L 133,422 C 133,414 130,404 124,387 Z" fill="url(#woodGrad)" stroke="#160803" stroke-width="1.5" />
+            <ellipse cx="110.5" cy="422" rx="22.5" ry="4.5" fill="#130803" stroke="#482512" stroke-width="1.5" />
 
-          <!-- Orificio 5 -->
-          <g transform="translate(140, 275)">
-            <circle id="hole_5_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
-            <path id="hole_5_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
-            <circle id="hole_5_inner" r="5" fill="#0d0502" />
-            <line x1="15" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
-            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">5</text>
-            <text x="64" y="3" fill="#d4b896" font-size="10">Medio der.</text>
-          </g>
+            <!-- Brillo de veta -->
+            <path d="M 106,58 L 108,380" stroke="rgba(255,255,255,0.12)" stroke-width="2.5" />
 
-          <!-- Orificio 6 (Doble en flautas barrocas) -->
-          <g transform="translate(140, 320)">
-            <circle id="hole_6_outer" r="9.5" fill="#150a06" stroke="#875231" stroke-width="2" />
-            <path id="hole_6_half" d="M 0,-9.5 A 9.5,9.5 0 0 1 0,9.5 Z" fill="transparent" />
-            <circle id="hole_6_inner" r="4.5" fill="#0d0502" />
-            <line x1="14" y1="0" x2="42" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
-            <text x="48" y="4" fill="#fef3c7" font-size="12" font-weight="600">6</text>
-            <text x="64" y="3" fill="#d4b896" font-size="10">Anular der.</text>
-          </g>
+            <!-- ORIFICIOS 1 AL 7 (SÓLO NÚMERO DE ORIFICIO) -->
+            <!-- Orificio 1 -->
+            <g transform="translate(110.5, 84)">
+              <circle id="hole_1_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <path id="hole_1_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
+              <circle id="hole_1_inner" r="5" fill="#0d0502" />
+              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">1</text>
+            </g>
 
-          <!-- Orificio 7 (Doble / Pie en flautas barrocas, ligeramente inclinado) -->
-          <g transform="translate(143, 365)">
-            <circle id="hole_7_outer" r="9" fill="#150a06" stroke="#875231" stroke-width="2" />
-            <path id="hole_7_half" d="M 0,-9 A 9,9 0 0 1 0,9 Z" fill="transparent" />
-            <circle id="hole_7_inner" r="4" fill="#0d0502" />
-            <line x1="14" y1="0" x2="39" y2="0" stroke="rgba(245,158,11,0.4)" stroke-width="1" />
-            <text x="45" y="4" fill="#fef3c7" font-size="12" font-weight="600">7</text>
-            <text x="61" y="3" fill="#d4b896" font-size="10">Meñique</text>
+            <!-- Orificio 2 -->
+            <g transform="translate(110.5, 126)">
+              <circle id="hole_2_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <path id="hole_2_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
+              <circle id="hole_2_inner" r="5" fill="#0d0502" />
+              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">2</text>
+            </g>
+
+            <!-- Orificio 3 -->
+            <g transform="translate(110.5, 168)">
+              <circle id="hole_3_outer" r="10" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <path id="hole_3_half" d="M 0,-10 A 10,10 0 0 1 0,10 Z" fill="transparent" />
+              <circle id="hole_3_inner" r="5" fill="#0d0502" />
+              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">3</text>
+            </g>
+
+            <!-- Orificio 4 -->
+            <g transform="translate(110.5, 210)">
+              <circle id="hole_4_outer" r="9.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <path id="hole_4_half" d="M 0,-9.5 A 9.5,9.5 0 0 1 0,9.5 Z" fill="transparent" />
+              <circle id="hole_4_inner" r="4.5" fill="#0d0502" />
+              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">4</text>
+            </g>
+
+            <!-- Orificio 5 -->
+            <g transform="translate(110.5, 252)">
+              <circle id="hole_5_outer" r="9.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <path id="hole_5_half" d="M 0,-9.5 A 9.5,9.5 0 0 1 0,9.5 Z" fill="transparent" />
+              <circle id="hole_5_inner" r="4.5" fill="#0d0502" />
+              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">5</text>
+            </g>
+
+            <!-- Orificio 6 -->
+            <g transform="translate(110.5, 294)">
+              <circle id="hole_6_outer" r="9" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <path id="hole_6_half" d="M 0,-9 A 9,9 0 0 1 0,9 Z" fill="transparent" />
+              <circle id="hole_6_inner" r="4" fill="#0d0502" />
+              <text x="22" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">6</text>
+            </g>
+
+            <!-- Orificio 7 -->
+            <g transform="translate(113, 336)">
+              <circle id="hole_7_outer" r="8.5" fill="#150a06" stroke="#875231" stroke-width="2" />
+              <path id="hole_7_half" d="M 0,-8.5 A 8.5,8.5 0 0 1 0,8.5 Z" fill="transparent" />
+              <circle id="hole_7_inner" r="3.8" fill="#0d0502" />
+              <text x="20" y="4" fill="#fef6e4" font-family="'Cinzel', serif" font-size="13" font-weight="700">7</text>
+            </g>
           </g>
-        </g>
-      </svg>
+        </svg>
+      </div>
     </div>
   </div>
 </div>
@@ -558,8 +463,7 @@ const NOTE_TABLE = [
 ];
 
 // ═══════════════════════════════════════════════════════
-// Tabla de digitación  [h1,h2,h3,h4,h5,h6,h7,h8(portavoz)]
-// 0 = abierto, 1 = cerrado, 2 = medio cerrado
+// Tabla de digitación [h1,h2,h3,h4,h5,h6,h7,h8(portavoz)]
 // ═══════════════════════════════════════════════════════
 const FINGERINGS = {
   "Do":     [1,1,1,1,1,1,1,1],
@@ -589,17 +493,12 @@ const FINGERINGS = {
   "Do'''":  [1,0,0,1,0,0,0,2]
 };
 
-// Referencias DOM
 const statusDot   = document.getElementById('statusDot');
 const statusText  = document.getElementById('statusText');
 const btnStart    = document.getElementById('btnStart');
 const noteNameEl  = document.getElementById('noteName');
 const freqDisplay = document.getElementById('freqDisplay');
-const tuningInd   = document.getElementById('tuningInd');
-const tuningCents = document.getElementById('tuningCents');
 
-// Mapeo de orificios del SVG [h0(portavoz), h1, h2, h3, h4, h5, h6, h7]
-// Nota: en FINGERINGS el orden es [h1, h2, h3, h4, h5, h6, h7, h8(portavoz)]
 function updateFingering(noteName) {
   const fg = noteName ? FINGERINGS[noteName] : null;
 
@@ -609,28 +508,23 @@ function updateFingering(noteName) {
     const innerEl = document.getElementById(`hole_${holeIdx}_inner`);
     if (!outerEl || !halfEl || !innerEl) continue;
 
-    // holeIdx 0 corresponde a h8 (portavoz, índice 7 en el array de digitación)
-    // holeIdx 1..7 corresponde a h1..h7 (índice holeIdx - 1)
     const val = fg ? (holeIdx === 0 ? fg[7] : fg[holeIdx - 1]) : 0;
 
     outerEl.removeAttribute('filter');
 
     if (val === 1) {
-      // Tapado completo (Verde LED brillante)
       outerEl.setAttribute('fill', '#10b981');
       outerEl.setAttribute('stroke', '#059669');
-      outerEl.setAttribute('filter', 'url(#glowGreen)');
+      outerEl.setAttribute('filter', 'url(#glowG)');
       halfEl.setAttribute('fill', 'transparent');
       innerEl.setAttribute('fill', '#d1fae5');
     } else if (val === 2) {
-      // Medio tapado (Rojo LED brillante a mitad)
       outerEl.setAttribute('fill', '#1e100a');
       outerEl.setAttribute('stroke', '#ef4444');
-      outerEl.setAttribute('filter', 'url(#glowRed)');
+      outerEl.setAttribute('filter', 'url(#glowR)');
       halfEl.setAttribute('fill', '#ef4444');
       innerEl.setAttribute('fill', '#fecaca');
     } else {
-      // Abierto (Madera oscura)
       outerEl.setAttribute('fill', '#150a06');
       outerEl.setAttribute('stroke', '#875231');
       halfEl.setAttribute('fill', 'transparent');
@@ -639,12 +533,9 @@ function updateFingering(noteName) {
   }
 }
 
-// Inicializar la flauta en estado abierto
 updateFingering(null);
 
-// ═══════════════════════════════════════════════════════
 // WebSocket
-// ═══════════════════════════════════════════════════════
 let ws = null;
 let wsConnected = false;
 
@@ -655,14 +546,14 @@ function connectWS() {
   ws.onopen = () => {
     wsConnected = true;
     statusDot.classList.add('on');
-    statusText.textContent = 'Conectado al servidor';
+    statusText.textContent = 'Conectado';
     ws.send(JSON.stringify({ type: 'register', device: 'browser' }));
   };
 
   ws.onclose = () => {
     wsConnected = false;
     statusDot.classList.remove('on');
-    statusText.textContent = 'Desconectado - Reconectando...';
+    statusText.textContent = 'Desconectado';
     setTimeout(connectWS, 2000);
   };
 
@@ -674,9 +565,7 @@ function sendNote(name) {
   if (ws && wsConnected) ws.send(name);
 }
 
-// ═══════════════════════════════════════════════════════
-// Audio & Algoritmo YIN para detección de tono
-// ═══════════════════════════════════════════════════════
+// Audio & YIN
 let audioCtx, analyser, micStream, isListening = false;
 const BUFFER_SIZE = 2048;
 let dataBuffer = new Float32Array(BUFFER_SIZE);
@@ -729,9 +618,7 @@ function matchNote(freq) {
     const c = Math.abs(freqToCents(freq, n.freq));
     if (c < bestCents) { bestCents = c; best = n; }
   }
-  if (bestCents <= 50) {
-    return { note: best, cents: freqToCents(freq, best.freq) };
-  }
+  if (bestCents <= 50) return { note: best };
   return null;
 }
 
@@ -753,7 +640,7 @@ function detect() {
     if (freq > 400 && freq < 2200) {
       const result = matchNote(freq);
       if (result) {
-        const { note, cents } = result;
+        const { note } = result;
 
         if (note.name === lastCandidate) {
           stableCount++;
@@ -770,11 +657,6 @@ function detect() {
             noteNameEl.classList.add('pop');
           }
           freqDisplay.textContent = freq.toFixed(1) + ' Hz';
-
-          const pct = 50 + (cents / 50) * 50;
-          tuningInd.style.left = Math.max(0, Math.min(100, pct)) + '%';
-          const sign = cents >= 0 ? '+' : '';
-          tuningCents.textContent = sign + cents.toFixed(1) + ' cents';
 
           updateFingering(note.name);
 
@@ -802,7 +684,7 @@ btnStart.addEventListener('click', async () => {
       dataBuffer = new Float32Array(BUFFER_SIZE);
 
       isListening = true;
-      btnStart.textContent = 'DETENER ESCUCHA';
+      btnStart.textContent = 'DETENER';
       btnStart.classList.add('active');
       requestAnimationFrame(detect);
     } catch (e) {
@@ -812,12 +694,10 @@ btnStart.addEventListener('click', async () => {
     isListening = false;
     if (micStream) micStream.getTracks().forEach(t => t.stop());
     if (audioCtx) audioCtx.close();
-    btnStart.textContent = 'INICIAR ESCUCHA';
+    btnStart.textContent = 'INICIAR';
     btnStart.classList.remove('active');
     noteNameEl.textContent = '—';
     freqDisplay.textContent = '— Hz';
-    tuningInd.style.left = '50%';
-    tuningCents.textContent = '0 cents';
     updateFingering(null);
     stableCount = 0;
     lastCandidate = '';
