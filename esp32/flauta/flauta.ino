@@ -14,6 +14,9 @@
 #include <Adafruit_SSD1306.h>
 #include <WiFi.h>
 #include <WebSocketsClient_Generic.h>
+// Necesario para deshabilitar el detector de bajo voltaje (brownout)
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
 
 // =============================================================
 // ⚙️  CONFIGURACIÓN DEL USUARIO - ¡MODIFICA ESTOS VALORES!
@@ -21,8 +24,8 @@
 
 // --- Credenciales WiFi ---
 // Cambia estos valores por el nombre y contraseña de tu red WiFi
-const char* wifi_ssid     = "consultorio";
-const char* wifi_password = "Consultorio2024";
+const char* wifi_ssid     = "proyecto";
+const char* wifi_password = "12345678";
 
 // --- Servidor WebSocket (Railway) ---
 // Cambia estos valores por la URL de tu servidor en Railway
@@ -377,6 +380,11 @@ void apagarTodosLosLeds() {
 // setup() - Inicialización del sistema
 // =============================================================
 void setup() {
+  // --- Deshabilitar brownout detector ---
+  // El WiFi consume picos de corriente que pueden reiniciar el ESP32
+  // si se alimenta por USB con cable o fuente de baja calidad.
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0);
+
   // --- Inicializar puerto serial para depuración ---
   Serial.begin(115200);
   Serial.println();
