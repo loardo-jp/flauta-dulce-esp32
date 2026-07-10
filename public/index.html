@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Flauta Dulce - ESP32</title>
+<title>PFS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -12,8 +12,6 @@ html { font-size: 16px; }
 
 :root {
   --bg-main: #f4ebd0;
-  --bg-card: #fffcf5;
-  --border-card: #d8c3a5;
   --text-main: #3e2723;
   --text-muted: #795548;
   --primary: #6d4c41;
@@ -45,18 +43,13 @@ body {
 
 header {
   text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 header h1 {
-  font-size: 2.1rem;
-  font-weight: 700;
+  font-size: 2.6rem;
+  font-weight: 800;
   color: var(--text-main);
-  letter-spacing: -0.5px;
-}
-header p {
-  font-size: 0.95rem;
-  color: var(--text-muted);
-  margin-top: 4px;
+  letter-spacing: 1px;
 }
 
 .top-controls {
@@ -65,7 +58,7 @@ header p {
   align-items: center;
   justify-content: center;
   gap: 16px;
-  margin-bottom: 28px;
+  margin-bottom: 36px;
 }
 
 .status-badge {
@@ -73,7 +66,6 @@ header p {
   align-items: center;
   gap: 8px;
   background: #eae0c8;
-  border: 1px solid var(--border-card);
   padding: 8px 16px;
   border-radius: 999px;
   font-size: 0.85rem;
@@ -118,7 +110,7 @@ header p {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  align-items: stretch;
+  align-items: center;
 }
 
 @media (max-width: 640px) {
@@ -127,38 +119,8 @@ header p {
   }
 }
 
-.card-panel {
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 10px 25px -5px rgba(90, 70, 50, 0.12);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
 .note-panel {
   text-align: center;
-  min-height: 360px;
-}
-.note-panel-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 20px;
-}
-
-.note-box {
-  background: #fdfaf3;
-  border: 1px solid #d8c3a5;
-  border-radius: 14px;
-  width: 100%;
-  max-width: 240px;
-  padding: 32px 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -166,10 +128,10 @@ header p {
 }
 
 .note-name {
-  font-size: 4.8rem;
+  font-size: 6rem;
   font-weight: 800;
   color: var(--accent-note);
-  min-height: 5.2rem;
+  min-height: 6.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -185,17 +147,17 @@ header p {
 }
 
 .freq-display {
-  font-size: 1rem;
+  font-size: 1.2rem;
   color: var(--text-muted);
-  margin-top: 8px;
-  font-weight: 500;
+  margin-top: 12px;
+  font-weight: 600;
 }
 
 .legend-mini {
   display: flex;
   gap: 16px;
-  margin-top: 24px;
-  font-size: 0.8rem;
+  margin-top: 32px;
+  font-size: 0.85rem;
   color: var(--text-muted);
 }
 .dot-legend {
@@ -206,7 +168,10 @@ header p {
 }
 
 .flute-panel {
-  padding: 20px 12px;
+  padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .flute-svg-wrap {
   width: 100%;
@@ -220,8 +185,7 @@ header p {
 
 <div class="app-container">
   <header>
-    <h1>Flauta Dulce - ESP32</h1>
-    <p>Asistente interactivo de digitación y tono en tiempo real</p>
+    <h1>PFS</h1>
   </header>
 
   <div class="top-controls">
@@ -233,21 +197,18 @@ header p {
   </div>
 
   <div class="workshop-stage">
-    <div class="card-panel note-panel">
-      <div class="note-panel-title">Nota Detectada</div>
-      <div class="note-box">
-        <div class="note-name" id="noteName">—</div>
-        <div class="freq-display" id="freqDisplay">— Hz</div>
-      </div>
+    <div class="note-panel">
+      <div class="note-name" id="noteName">—</div>
+      <div class="freq-display" id="freqDisplay">— Hz</div>
 
       <div class="legend-mini">
         <span><span class="dot-legend" style="background:#10b981;"></span>Tapado</span>
         <span><span class="dot-legend" style="background:#ef4444;"></span>Medio</span>
-        <span><span class="dot-legend" style="background:#fffcf5; border:1px solid #795548;"></span>Abierto</span>
+        <span><span class="dot-legend" style="background:#f4ebd0; border:1px solid #795548;"></span>Abierto</span>
       </div>
     </div>
 
-    <div class="card-panel flute-panel">
+    <div class="flute-panel">
       <div class="flute-svg-wrap">
         <svg id="recorderSvg" viewBox="0 0 250 440" width="100%" style="max-width: 270px; height: auto;">
           <defs>
