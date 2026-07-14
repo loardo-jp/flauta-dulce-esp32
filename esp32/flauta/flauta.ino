@@ -1,5 +1,5 @@
 // PFS - Flauta Dulce Educativa (ESP32)
-// Recibe el nombre de la nota por Serial (USB) y enciende los LEDs
+// Modo Serial USB directo + Retrato PROGMEM de Joseph Fourier en OLED
 
 #include <Wire.h>
 #include <Adafruit_GFX.h>
@@ -29,46 +29,7 @@ const int o8r = 23;
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
-// Estructura de digitación
-struct Digitacion {
-  const char* nota;
-  int h1, h2, h3, h4, h5, h6, h7, h8;
-};
-
-const Digitacion tablaDigitaciones[] = {
-  { "Do",      1, 1, 1, 1, 1, 1, 1, 1 },
-  { "Do#",     1, 1, 1, 1, 1, 1, 2, 1 },
-  { "Re",      1, 1, 1, 1, 1, 1, 0, 1 },
-  { "Re#",     1, 1, 1, 1, 1, 2, 0, 1 },
-  { "Mi",      1, 1, 1, 1, 1, 0, 0, 1 },
-  { "Fa",      1, 1, 1, 1, 0, 0, 0, 1 },
-  { "Fa#",     1, 1, 1, 0, 1, 1, 1, 1 },
-  { "Sol",     1, 1, 1, 0, 0, 0, 0, 1 },
-  { "Sol#",    1, 1, 0, 1, 1, 0, 0, 1 },
-  { "La",      1, 1, 0, 0, 0, 0, 0, 1 },
-  { "La#",     1, 0, 1, 0, 0, 0, 0, 1 },
-  { "Si",      1, 0, 0, 0, 0, 0, 0, 1 },
-  { "Do''",    0, 1, 0, 0, 0, 0, 0, 1 },
-  { "Do#''",   1, 1, 0, 0, 0, 0, 0, 0 },
-  { "Re''",    0, 1, 0, 0, 0, 0, 0, 0 },
-  { "Re#''",   1, 1, 1, 1, 1, 2, 0, 2 },
-  { "Mi''",    1, 1, 1, 1, 1, 1, 1, 1 },
-  { "Fa''",    1, 1, 1, 1, 0, 0, 0, 2 },
-  { "Fa#''",   1, 1, 1, 0, 1, 0, 0, 2 },
-  { "Sol''",   1, 1, 1, 0, 0, 0, 0, 2 },
-  { "Sol#''",  1, 1, 0, 1, 0, 0, 0, 2 },
-  { "La''",    1, 1, 0, 0, 0, 0, 0, 2 },
-  { "La#''",   1, 1, 0, 1, 1, 1, 0, 2 },
-  { "Si''",    1, 1, 0, 1, 1, 0, 0, 2 },
-  { "Do'''",   1, 0, 0, 1, 0, 0, 0, 2 },
-};
-
-const int NUM_NOTAS = sizeof(tablaDigitaciones) / sizeof(tablaDigitaciones[0]);
-
-void alumbrarNota(int h1, int h2, int h3, int h4, int h5, int h6, int h7, int h8) {
-  display.clearDisplay();
-
-// Mapa de bits PROGMEM 48x64 - Retrato de Joseph Fourier en blanco y negro
+// Mapa de bits PROGMEM 48x64 - Retrato monocromo en blanco y negro de Joseph Fourier
 const unsigned char logoFourier[] PROGMEM = {
   0x00, 0x03, 0xf8, 0x00, 0x00, 0x00,
   0x00, 0x1f, 0xfe, 0x00, 0x00, 0x00,
@@ -136,6 +97,42 @@ const unsigned char logoFourier[] PROGMEM = {
   0xc0, 0x00, 0x00, 0x00, 0x00, 0x03
 };
 
+// Estructura de digitación
+struct Digitacion {
+  const char* nota;
+  int h1, h2, h3, h4, h5, h6, h7, h8;
+};
+
+const Digitacion tablaDigitaciones[] = {
+  { "Do",      1, 1, 1, 1, 1, 1, 1, 1 },
+  { "Do#",     1, 1, 1, 1, 1, 1, 2, 1 },
+  { "Re",      1, 1, 1, 1, 1, 1, 0, 1 },
+  { "Re#",     1, 1, 1, 1, 1, 2, 0, 1 },
+  { "Mi",      1, 1, 1, 1, 1, 0, 0, 1 },
+  { "Fa",      1, 1, 1, 1, 0, 0, 0, 1 },
+  { "Fa#",     1, 1, 1, 0, 1, 1, 1, 1 },
+  { "Sol",     1, 1, 1, 0, 0, 0, 0, 1 },
+  { "Sol#",    1, 1, 0, 1, 1, 0, 0, 1 },
+  { "La",      1, 1, 0, 0, 0, 0, 0, 1 },
+  { "La#",     1, 0, 1, 0, 0, 0, 0, 1 },
+  { "Si",      1, 0, 0, 0, 0, 0, 0, 1 },
+  { "Do''",    0, 1, 0, 0, 0, 0, 0, 1 },
+  { "Do#''",   1, 1, 0, 0, 0, 0, 0, 0 },
+  { "Re''",    0, 1, 0, 0, 0, 0, 0, 0 },
+  { "Re#''",   1, 1, 1, 1, 1, 2, 0, 2 },
+  { "Mi''",    1, 1, 1, 1, 1, 1, 1, 1 },
+  { "Fa''",    1, 1, 1, 1, 0, 0, 0, 2 },
+  { "Fa#''",   1, 1, 1, 0, 1, 0, 0, 2 },
+  { "Sol''",   1, 1, 1, 0, 0, 0, 0, 2 },
+  { "Sol#''",  1, 1, 0, 1, 0, 0, 0, 2 },
+  { "La''",    1, 1, 0, 0, 0, 0, 0, 2 },
+  { "La#''",   1, 1, 0, 1, 1, 1, 0, 2 },
+  { "Si''",    1, 1, 0, 1, 1, 0, 0, 2 },
+  { "Do'''",   1, 0, 0, 1, 0, 0, 0, 2 },
+};
+
+const int NUM_NOTAS = sizeof(tablaDigitaciones) / sizeof(tablaDigitaciones[0]);
+
 void mostrarPantallaNotaYFourier(const char* nombreNota) {
   display.clearDisplay();
 
@@ -151,10 +148,10 @@ void mostrarPantallaNotaYFourier(const char* nombreNota) {
   // Nombre de la nota en grande en la mitad izquierda
   int len = strlen(nombreNota);
   if (len <= 3) {
-    display.setTextSize(3); // Letra muy grande si es corta (ej. Do, Re#)
+    display.setTextSize(3);
     display.setCursor(0, 22);
   } else {
-    display.setTextSize(2); // Letra mediana si es larga (ej. Sol#'')
+    display.setTextSize(2);
     display.setCursor(0, 26);
   }
   display.println(nombreNota);
@@ -163,7 +160,6 @@ void mostrarPantallaNotaYFourier(const char* nombreNota) {
 }
 
 void alumbrarNota(int h1, int h2, int h3, int h4, int h5, int h6, int h7, int h8) {
-  // Control de LEDs físicos de la flauta
   digitalWrite(o1, (h1 >= 1) ? HIGH : LOW);
   digitalWrite(o2, (h2 >= 1) ? HIGH : LOW);
   digitalWrite(o3, (h3 >= 1) ? HIGH : LOW);
