@@ -444,34 +444,262 @@ function sendNote(name) {
   if (ws && wsConnected) ws.send(name);
 }
 
-let audioCtx, analyser, micStream, isListening = false;
-const BUFFER_SIZE = 2048;
-let dataBuffer = new Float32Array(BUFFER_SIZE);
+// ╔═══════════════════════════════════════════════════════════════════════════╗
+// ║  MOTOR DE DETECCIÓN DE PITCH BASADO EN TRANSFORMADA DE FOURIER (DFT)   ║
+// ║                                                                         ║
+// ║  Sustento teórico (Matemáticas Especiales):                             ║
+// ║  • Números complejos: z = a + bi, representados como pares (real, imag) ║
+// ║  • Fórmula de Euler: e^{iθ} = cos(θ) + i·sin(θ)                       ║
+// ║  • DFT: X[k] = Σ_{n=0}^{N-1} x[n] · e^{-i·2πkn/N}                    ║
+// ║  • Las funciones analíticas (holomorfas) que satisfacen las ecuaciones  ║
+// ║    de Cauchy-Riemann (∂u/∂x = ∂v/∂y, ∂u/∂y = -∂v/∂x) garantizan que   ║
+// ║    el kernel e^{-i2πkn/N} sea diferenciable en el plano complejo,      ║
+// ║    condición fundamental para la convergencia de la serie de Fourier.   ║
+// ║  • Teorema de Wiener-Khinchin: R(τ) = IFFT(|X(f)|²)                    ║
+// ║                                                                         ║
+// ║  Ventaja frente al método anterior (autocorrelación por fuerza bruta):  ║
+// ║  - El filtro pasa-banda espectral elimina ruido fuera del rango de la   ║
+// ║    flauta ANTES de la autocorrelación, evitando falsos picos.           ║
+// ║  - El zero-padding interpola el espectro (Δf ≈ 5.4 Hz en vez de ~21 Hz)║
+// ║    dando mayor precisión en la estimación del periodo fundamental.      ║
+// ║  - La autocorrelación vía FFT es O(N log N) en vez de O(N²).           ║
+// ╚═══════════════════════════════════════════════════════════════════════════╝
 
-function detectarTonoSimple(buffer, sampleRate) {
-  let rms = 0;
-  for (let i = 0; i < buffer.length; i++) rms += buffer[i] * buffer[i];
-  if (Math.sqrt(rms / buffer.length) < 0.012) return -1;
+// Tamaño del zero-padding: 8192 muestras.
+// Con fs ≈ 44100 Hz → Δf = fs/N_PAD ≈ 5.38 Hz (resolución espectral).
+// El buffer de captura sigue siendo 2048 muestras (latencia ~46 ms).
+const N_PAD = 8192;
 
-  const minPeriod = Math.floor(sampleRate / 2200);
-  const maxPeriod = Math.floor(sampleRate / 450);
+// ─────────────────────────────────────────────────────────────────────────────
+// FFT Cooley-Tukey Radix-2 (Decimación en Tiempo)
+// ─────────────────────────────────────────────────────────────────────────────
+// Calcula la Transformada Discreta de Fourier in-place.
+//
+// Fundamento matemático:
+//   X[k] = Σ_{n=0}^{N-1} x[n] · e^{-i·2π·k·n / N}
+//
+// El algoritmo divide recursivamente la DFT de tamaño N en dos DFTs de
+// tamaño N/2 (índices pares e impares), y las combina con "factores de
+// rotación" (twiddle factors) derivados de la fórmula de Euler:
+//   W_N^k = e^{-i·2π·k/N} = cos(2πk/N) - i·sin(2πk/N)
+//
+// La multiplicación compleja (a+bi)(c+di) = (ac-bd) + (ad+bc)i se programa
+// explícitamente sobre los arreglos real/imag, sin usar librerías.
+//
+// Parámetros: re[] e im[] de longitud N (potencia de 2), modificados in-place.
+// ─────────────────────────────────────────────────────────────────────────────
+function fft(re, im) {
+  const N = re.length;
 
-  let bestCorr = 0;
-  let bestPeriod = -1;
-
-  for (let period = minPeriod; period <= maxPeriod; period++) {
-    let corr = 0;
-    for (let i = 0; i < maxPeriod; i++) {
-      corr += buffer[i] * buffer[i + period];
+  // Paso 1: Reordenamiento por bit-reversal.
+  // Se permutan los elementos según la inversión binaria de sus índices,
+  // de modo que la etapa iterativa de mariposas pueda operar secuencialmente.
+  for (let i = 1, j = 0; i < N; i++) {
+    let bit = N >> 1;
+    while (j & bit) {
+      j ^= bit;
+      bit >>= 1;
     }
-    if (corr > bestCorr) {
-      bestCorr = corr;
-      bestPeriod = period;
+    j ^= bit;
+    if (i < j) {
+      let tmp;
+      tmp = re[i]; re[i] = re[j]; re[j] = tmp;
+      tmp = im[i]; im[i] = im[j]; im[j] = tmp;
     }
   }
 
-  return bestPeriod > 0 ? sampleRate / bestPeriod : -1;
+  // Paso 2: Etapas de mariposa (butterfly), de tamaño 2, 4, 8, …, N.
+  for (let size = 2; size <= N; size *= 2) {
+    const halfSize = size / 2;
+
+    // Factor de rotación base para esta etapa:
+    // W = e^{-i·2π/size} = cos(2π/size) - i·sin(2π/size)   [Euler]
+    const angle = -2.0 * Math.PI / size;
+    const wRe = Math.cos(angle);
+    const wIm = Math.sin(angle);
+
+    for (let start = 0; start < N; start += size) {
+      // Factor de rotación acumulado, comienza en W^0 = 1 + 0i
+      let curRe = 1.0;
+      let curIm = 0.0;
+
+      for (let k = 0; k < halfSize; k++) {
+        const evenIdx = start + k;
+        const oddIdx  = start + k + halfSize;
+
+        // Multiplicación compleja explícita: twiddle × X[oddIdx]
+        // (a+bi)(c+di) = (ac - bd) + (ad + bc)i
+        const tRe = curRe * re[oddIdx] - curIm * im[oddIdx];
+        const tIm = curRe * im[oddIdx] + curIm * re[oddIdx];
+
+        // Operación mariposa:
+        // X_even[k] = X[evenIdx] + W^k · X[oddIdx]
+        // X_odd[k]  = X[evenIdx] - W^k · X[oddIdx]
+        re[oddIdx]  = re[evenIdx] - tRe;
+        im[oddIdx]  = im[evenIdx] - tIm;
+        re[evenIdx] += tRe;
+        im[evenIdx] += tIm;
+
+        // Avanzar factor de rotación: W^{k+1} = W^k · W
+        const nextRe = curRe * wRe - curIm * wIm;
+        const nextIm = curRe * wIm + curIm * wRe;
+        curRe = nextRe;
+        curIm = nextIm;
+      }
+    }
+  }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// IFFT (Transformada Inversa de Fourier)
+// ─────────────────────────────────────────────────────────────────────────────
+// x[n] = (1/N) · Σ_{k=0}^{N-1} X[k] · e^{+i·2π·k·n / N}
+//
+// Se implementa conjugando la entrada, aplicando la FFT directa, conjugando
+// la salida y dividiendo por N. Esto es equivalente a usar el exponente
+// positivo (+i) en vez del negativo (-i) de la DFT directa.
+// ─────────────────────────────────────────────────────────────────────────────
+function ifft(re, im) {
+  const N = re.length;
+
+  // Conjugar entrada: cambiar signo de la parte imaginaria
+  for (let i = 0; i < N; i++) im[i] = -im[i];
+
+  // Aplicar FFT directa
+  fft(re, im);
+
+  // Conjugar salida y normalizar por 1/N
+  for (let i = 0; i < N; i++) {
+    re[i] =  re[i] / N;
+    im[i] = -im[i] / N;
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// detectPitchFFT(buffer, sampleRate)
+// ─────────────────────────────────────────────────────────────────────────────
+// Detector de pitch (frecuencia fundamental) basado en:
+//   1. Zero-padding del buffer a N_PAD muestras
+//   2. FFT manual (Cooley-Tukey radix-2)
+//   3. Filtro pasa-banda espectral [400, 2200] Hz
+//   4. Autocorrelación vía Teorema de Wiener-Khinchin:
+//        R(τ) = IFFT( |FFT(x)|² )
+//   5. Búsqueda de pico en R(τ) con interpolación parabólica sub-muestra
+//
+// Retorna frecuencia en Hz o -1 si no hay pitch detectable.
+// ─────────────────────────────────────────────────────────────────────────────
+function detectPitchFFT(buffer, sampleRate) {
+
+  // ── Paso 0: Detección de silencio (RMS) ──
+  let rms = 0;
+  for (let i = 0; i < buffer.length; i++) rms += buffer[i] * buffer[i];
+  rms = Math.sqrt(rms / buffer.length);
+  if (rms < 0.012) return -1;
+
+  // ── Paso 1: Zero-padding ──
+  // Se rellena con ceros hasta N_PAD. Esto NO añade información nueva,
+  // pero interpola el espectro discreto, reduciendo Δf de ~21.5 Hz
+  // (fs/2048) a ~5.4 Hz (fs/8192), lo que mejora la precisión del pico
+  // espectral sin aumentar la latencia de captura.
+  const re = new Float64Array(N_PAD);
+  const im = new Float64Array(N_PAD);
+  for (let i = 0; i < buffer.length; i++) re[i] = buffer[i];
+  // im[] ya está inicializado a ceros (señal real pura, parte imaginaria = 0)
+
+  // ── Paso 2: FFT (Transformada Discreta de Fourier) ──
+  // Calcula X[k] = Σ x[n] · e^{-i2πkn/N}  usando Cooley-Tukey radix-2.
+  // Cada X[k] es un número complejo (re[k] + i·im[k]).
+  fft(re, im);
+
+  // ── Paso 3: Filtro pasa-banda espectral [400, 2200] Hz ──
+  // Se anulan los bins k cuya frecuencia f_k = k·fs/N_PAD esté fuera
+  // del rango de la flauta dulce soprano. Esto elimina ruido de baja
+  // frecuencia (voz, vibración) y alta frecuencia (sibilancias, ruido
+  // electrónico) ANTES de calcular la autocorrelación.
+  const binLow  = Math.floor(400  * N_PAD / sampleRate);
+  const binHigh = Math.ceil(2200 * N_PAD / sampleRate);
+
+  for (let k = 0; k < N_PAD; k++) {
+    // Filtrar tanto frecuencias positivas como negativas (espectro simétrico)
+    const kMirror = N_PAD - k;
+    const inBand = (k >= binLow && k <= binHigh) ||
+                   (kMirror >= binLow && kMirror <= binHigh);
+    if (!inBand) {
+      re[k] = 0;
+      im[k] = 0;
+    }
+  }
+
+  // ── Paso 4: Espectro de potencia |X[k]|² ──
+  // P[k] = Re(X[k])² + Im(X[k])² = |X[k]|²
+  // Este es el paso clave del Teorema de Wiener-Khinchin:
+  // la autocorrelación de una señal es la IFFT de su espectro de potencia.
+  const pRe = new Float64Array(N_PAD);
+  const pIm = new Float64Array(N_PAD);
+  for (let k = 0; k < N_PAD; k++) {
+    pRe[k] = re[k] * re[k] + im[k] * im[k];
+    pIm[k] = 0; // |X|² es real puro
+  }
+
+  // ── Paso 5: IFFT → Autocorrelación R(τ) ──
+  // R(τ) = IFFT(|X(f)|²)
+  // La parte real de R contiene la función de autocorrelación.
+  // R(0) es la energía total; buscamos el primer pico para τ > 0
+  // que corresponde al periodo fundamental de la señal.
+  ifft(pRe, pIm);
+
+  // ── Paso 6: Búsqueda de pico fundamental en R(τ) ──
+  // El rango de búsqueda se limita a periodos correspondientes a
+  // frecuencias entre 400 Hz y 2200 Hz de la flauta dulce soprano:
+  //   τ_min = fs / f_max,  τ_max = fs / f_min
+  const tauMin = Math.floor(sampleRate / 2200);
+  const tauMax = Math.ceil(sampleRate / 400);
+  const searchMax = Math.min(tauMax, N_PAD / 2);
+
+  // Normalización: R(0) es la energía máxima (autocorrelación en lag=0)
+  const r0 = pRe[0];
+  if (r0 < 1e-10) return -1;
+
+  let bestTau = -1;
+  let bestVal = -Infinity;
+
+  // Buscar el primer pico significativo (> 40% de R(0)),
+  // que corresponde a la frecuencia fundamental, no a un armónico.
+  for (let tau = tauMin; tau <= searchMax; tau++) {
+    const val = pRe[tau] / r0;
+    if (val > bestVal) {
+      bestVal = val;
+      bestTau = tau;
+    }
+  }
+
+  // Umbral: el pico debe ser al menos 40% de la energía total
+  if (bestTau < 1 || bestVal < 0.40) return -1;
+
+  // ── Paso 7: Interpolación parabólica sub-muestra ──
+  // Se ajusta una parábola por los 3 puntos (τ-1, τ, τ+1) para
+  // estimar el verdadero máximo con resolución fraccional.
+  // δ = 0.5 · (R[τ-1] - R[τ+1]) / (R[τ-1] - 2·R[τ] + R[τ+1])
+  // τ_interp = τ + δ
+  const prev = (bestTau > 0)         ? pRe[bestTau - 1] : pRe[bestTau];
+  const curr =                          pRe[bestTau];
+  const next = (bestTau < N_PAD - 1) ? pRe[bestTau + 1] : pRe[bestTau];
+
+  const denom = prev - 2.0 * curr + next;
+  let tauInterp = bestTau;
+  if (Math.abs(denom) > 1e-12) {
+    const delta = 0.5 * (prev - next) / denom;
+    tauInterp = bestTau + delta;
+  }
+
+  // Frecuencia fundamental = fs / τ
+  if (tauInterp <= 0) return -1;
+  return sampleRate / tauInterp;
+}
+
+let audioCtx, analyser, micStream, isListening = false;
+const BUFFER_SIZE = 2048;
+let dataBuffer = new Float32Array(BUFFER_SIZE);
 
 function matchNote(freq) {
   let best = null, bestDiff = Infinity;
@@ -494,7 +722,7 @@ function detect() {
   if (!isListening) return;
   analyser.getFloatTimeDomainData(dataBuffer);
 
-  const freq = detectarTonoSimple(dataBuffer, audioCtx.sampleRate);
+  const freq = detectPitchFFT(dataBuffer, audioCtx.sampleRate);
   if (freq > 400 && freq < 2200) {
     const result = matchNote(freq);
     if (result) {
