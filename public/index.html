@@ -105,6 +105,28 @@ header h1 {
   box-shadow: 0 4px 12px rgba(198, 40, 40, 0.35);
 }
 
+.btn-usb {
+  padding: 10px 24px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  background: transparent;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-usb:hover {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-usb.connected {
+  background: #2e7d32;
+  border-color: #2e7d32;
+  color: #fff;
+}
+
 .workshop-stage {
   width: 100%;
   display: grid;
@@ -189,6 +211,7 @@ header h1 {
   </header>
 
   <div class="top-controls">
+    <button class="btn-usb" id="btnUsb">CONECTAR USB</button>
     <button class="btn-start" id="btnStart">INICIAR</button>
   </div>
 
@@ -373,8 +396,6 @@ const FINGERINGS = {
   "Do'''":  [1,0,0,1,0,0,0,2]
 };
 
-const statusDot   = document.getElementById('statusDot');
-const statusText  = document.getElementById('statusText');
 const btnStart    = document.getElementById('btnStart');
 const noteNameEl  = document.getElementById('noteName');
 const freqDisplay = document.getElementById('freqDisplay');
@@ -415,33 +436,39 @@ function updateFingering(noteName) {
 
 updateFingering(null);
 
-let ws = null;
-let wsConnected = false;
+let serialPort = null;
+let serialWriter = null;
+const btnUsb = document.getElementById('btnUsb');
 
-function connectWS() {
-  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
-  ws = new WebSocket(`${proto}://${location.host}/ws`);
+btnUsb.addEventListener('click', async () => {
+  if (serialPort) {
+    try {
+      if (serialWriter) { serialWriter.releaseLock(); serialWriter = null; }
+      await serialPort.close();
+    } catch (_) {}
+    serialPort = null;
+    btnUsb.textContent = 'CONECTAR USB';
+    btnUsb.classList.remove('connected');
+    return;
+  }
+  try {
+    serialPort = await navigator.serial.requestPort();
+    await serialPort.open({ baudRate: 115200 });
+    serialWriter = serialPort.writable.getWriter();
+    btnUsb.textContent = 'USB CONECTADO';
+    btnUsb.classList.add('connected');
+  } catch (e) {
+    serialPort = null;
+    serialWriter = null;
+    alert('No se pudo conectar al puerto serial: ' + e.message);
+  }
+});
 
-  ws.onopen = () => {
-    wsConnected = true;
-    if (statusDot) statusDot.classList.add('on');
-    if (statusText) statusText.textContent = 'Conectado';
-    ws.send(JSON.stringify({ type: 'register', device: 'browser' }));
-  };
-
-  ws.onclose = () => {
-    wsConnected = false;
-    if (statusDot) statusDot.classList.remove('on');
-    if (statusText) statusText.textContent = 'Desconectado';
-    setTimeout(connectWS, 2000);
-  };
-
-  ws.onerror = () => ws.close();
-}
-connectWS();
-
-function sendNote(name) {
-  if (ws && wsConnected) ws.send(name);
+async function sendNote(name) {
+  if (serialWriter) {
+    const encoder = new TextEncoder();
+    await serialWriter.write(encoder.encode(name + '\n'));
+  }
 }
 
 // ╔═══════════════════════════════════════════════════════════════════════════╗
